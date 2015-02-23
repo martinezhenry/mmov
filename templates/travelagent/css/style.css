@@ -1,0 +1,25 @@
+.my_input {
+  
+  	border-radius: 5px;
+	width: 200px;
+  
+}
+
+.my_p {
+	width: 200px;
+	display: inline-block;
+}
+
+
+.my_form {
+
+	margin-bottom: 15px;
+}
+
+
+.my_line {
+
+	background: #1f73a8;
+	height: 1px;
+
+}

@@ -1,0 +1,46 @@
+
+
+
+.per-form > div {
+
+	display: flex;
+
+}
+
+.per-form > div > div {
+
+	margin: 10px;
+
+}
+
+
+.per-form > div > div > p {
+
+	display: inline-flex;
+	width: 160px;
+	direction: rtl;
+	font-size: 16px;
+	padding-right: 10px;
+
+}
+
+
+.per-form input {
+
+	width: 200px;
+	height: 30px;
+	//border: 1px solid blue;
+	border-radius: 5px;
+
+}
+
+.per-form select {
+
+	width: 200px;
+	height: 30px;
+	//border: 1px solid blue;
+	border-radius: 5px;
+
+}
+
+

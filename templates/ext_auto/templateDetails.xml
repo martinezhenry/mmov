@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE install PUBLIC "-//Joomla! 1.6//DTD template 1.0//EN" "http://www.joomla.org/xml/dtd/1.6/template-install.dtd">
+<extension
+	version="2.5"
+	type="template"
+	method="upgrade">
+	<name>ext_auto</name>
+	<version>1.2</version>
+	<creationDate>August 2011</creationDate>
+	<author>http://platinum-joomla-templates.com/</author>
+	<authorEmail>platinum.joomla.templates@gmail.com</authorEmail>
+	<authorUrl>http://platinum-joomla-templates.com/</authorUrl>
+	<copyright>Copyright (C) 2011-2015 Platinum-Joomla-Templates.com. All Rights Reserved.</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<description>
+	<![CDATA[
+		<div align="center">
+			<div class="alert alert-success" style="background-color:#DFF0D8;border-color:#D6E9C6;color: #468847;padding: 1px 0;">			
+				<p> </p>				
+				<p>Copyright 2011 - 2015 <a href='http://platinum-joomla-templates.com/' title='Visit Platinum-Joomla-Templates.com!'>Platinum-Joomla-Templates.com</a>.</p>
+				<p> </p>	
+			</div>
+			<style>table.adminform{width: 100%;}</style>
+		</div>
+		]]>
+		</description>
+	<engine>t3</engine>
+	<files>
+		<filename>component.php</filename>
+		<filename>favicon.ico</filename>
+		<filename>index.html</filename>
+		<filename>index.php</filename>
+		<filename>info.xml</filename>
+		<filename>params.ini</filename>
+		<filename>template_preview.png</filename>
+		<filename>template_thumbnail.png</filename>
+		<folder>etc</folder>
+		<folder>css</folder>
+		<folder>images</folder>
+		<folder>info</folder>
+		<folder>blocks</folder>
+		<folder>html</folder>
+		<folder>themes</folder>
+		
+	</files>
+
+	<languages>
+		<language tag="en-GB">en-GB.tpl_ext_auto.ini</language>
+	</languages>
+	<administration>
+		<languages folder="admin">
+			<language tag="en-GB">en-GB.tpl_ext_auto.ini</language>
+		</languages>
+	</administration>
+
+	<positions>
+		<position>hornav</position>
+		<position>breadcrumbs</position>
+		<position>search</position>
+		<position>banner</position>
+		<position>left</position>
+		<position>right</position>
+		<position>top</position>
+		<position>user1</position>
+		<position>user2</position>
+		<position>user3</position>
+		<position>user4</position>
+		<position>user5</position>
+		<position>user6</position>
+		<position>user7</position>
+		<position>user8</position>
+		<position>user9</position>
+		<position>user10</position>
+		<position>user11</position>
+		<position>footer</position>
+		<position>syndicate</position>
+		<position>debug</position>
+		<position>mega1</position>
+		<position>mega2</position>
+		<position>social</position>
+		<position>slider</position>
+		<position>top-panel</position>
+		<position>cart</position>
+		<position>adv</position>
+	</positions>
+
+	<config>
+		<fields name="params" addfieldpath="/plugins/system/jat3/jat3/core/element">
+		</fields>
+    </config>
+</extension>
