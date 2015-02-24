@@ -28,6 +28,7 @@
 
 		function desconectar(){
 			pg_close($this->conex);
+			unset($this->conex);
 		}
 
 		function liberarResult($res){
@@ -47,7 +48,7 @@
 
 			//$query = "select idbancos, nombre_completo from bancos";
 
-			$resultado = pg_query($sql) or die("Error en la Consulta SQL");
+			$resultado = pg_query($sql) or die("Error en la Consulta SQL: " . pg_last_error($this->conex));
 
 			$numReg = pg_num_rows($resultado);
 
