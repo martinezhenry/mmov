@@ -8,6 +8,7 @@
 .per-form > div > div {
 
 	margin: 10px;
+	width: 100%;
 
 }
 
@@ -16,28 +17,35 @@
 
 	display: inline-flex;
 	width: 150px;
-	direction: rtl;
+	max-width: 150px;
+	//direction: rtl;
 	font-size: 16px;
 	padding-right: 10px;
+	//float: left;
 
 }
 
 
 .per-form input {
 
-	width: 180px;
+	width: 100%;
 	height: 30px;
+	max-width: 180px;
 	//border: 1px solid blue;
 	border-radius: 5px;
+	//float: right;
 
 }
 
 .per-form select {
 
-	width: 186px;
+	width: 100%;
 	height: 36px;
+	max-width: 186px;
+	max-heigth: 36px;
 	//border: 1px solid blue;
 	border-radius: 5px;
+	//float: right;
 
 }
 
@@ -69,5 +77,107 @@ content: attr(title);
   background-image: -ms-linear-gradient(top, #eeeeee, #cccccc);
   background-image: -o-linear-gradient(top, #eeeeee, #cccccc);
 
+}
+
+
+
+.per-table {
+
+	//border: 1px solid;
+	//padding: 10px;
+	width: 100%;
+	max-height: 400px;
+
+
+}
+
+
+.per-table tr {
+
+	height: 30px;
+	min-height: 20px;
+	max-height: 40px;
+	border-bottom: 1px solid;
+	width: 100%;
+
+}
+
+.per-table tbody tr td, .per-table thead tr th {
+
+
+	border-bottom: 1px solid gray;
+
+}
+
+.per-table tr {
+
+
+	text-align: center;
+}
+
+.per-table tr:hover {
+
+
+	background : rgba(158, 160, 149, 0.26);;
+}
+
+.div_table {
+
+	width: 100%;
+	height: 332px;
+	overflow: auto;
+	border: 1px solid gray;
+	border-radius: 5px;
+
+}
+
+#img_eliminar {
+
+	background: url('../images/personal_img/eliminar_gray.png');
+	background-size: cover;
+	background-repeat: no-repeat;
+	width: 16px;
+	height: 16px;
+	padding: 1px;
+
+}
+
+
+#img_eliminar:hover {
+
+	background: url('../images/personal_img/eliminar.png');
+	background-size: cover;
+	background-repeat: no-repeat;
+	width: 16px;
+	height: 16px;
+	padding: 1px;
+}
+
+
+#img_agregar {
+
+	background: url('../images/personal_img/agregar_gray.png');
+	background-size: cover;
+	background-repeat: no-repeat;
+	width: 30px;
+	height: 30px;
+	padding: 0px;
+	float: right;
+	margin: 0px;
+
+
+}
+
+
+#img_agregar:hover {
+
+	background: url('../images/personal_img/agregar.png');
+	background-size: cover;
+	background-repeat: no-repeat;
+	width: 30px;
+	height: 30px;
+	padding: 0px;
+	float: right;
+	margin: 0px;
 }
 
