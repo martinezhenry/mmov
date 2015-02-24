@@ -2,46 +2,6 @@
 
 
 
-function cargarBancos(){
-
-//alert('cargarBancos');
-
-jQuery.ajax({
-
-	type : 'post',
-	data : {cargarBancos:1},
-	url  : '../../php/cargarDatos.php',
-	
-
-}).done(function(resp){
-
-
-	
-		//alert(resp);
-		if (resp != 1){
-		var ar = JSON.parse(resp);
-		var html = '';
-
-		for (var i = 0; i < ar.length; i++){
-
-			html += '<option value= "' + ar[i].idbancos + '">' + ar[i].nombre_completo + '</option>';
-		}
-
-		jQuery('#sel_banco').append(html);
-
-	} else{
-		alert('Error en la carga de los bancos');
-	}
-
-
-
-
-
-});
-
-}
-
-
 function cargarCuentas(){
 
 //alert('cargarCuentas');
