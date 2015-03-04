@@ -4,7 +4,7 @@
  * Displays the version check
  *
  * @package         NoNumber Framework
- * @version         15.1.1
+ * @version         15.2.11
  *
  * @author          Peter van Westen <peter@nonumber.nl>
  * @link            http://www.nonumber.nl
@@ -14,10 +14,11 @@
 
 defined('_JEXEC') or die;
 
-class JFormFieldNN_Version extends JFormField
+require_once JPATH_PLUGINS . '/system/nnframework/helpers/field.php';
+
+class JFormFieldNN_Version extends nnFormField
 {
 	public $type = 'Version';
-	private $params = null;
 
 	protected function getLabel()
 	{
@@ -61,10 +62,5 @@ class JFormFieldNN_Version extends JFormField
 		require_once JPATH_PLUGINS . '/system/nnframework/helpers/versions.php';
 
 		return '</div><div class="hide">' . nnVersions::getInstance()->getMessage($extension, $xml);
-	}
-
-	private function get($val, $default = '')
-	{
-		return (isset($this->params[$val]) && (string) $this->params[$val] != '') ? (string) $this->params[$val] : $default;
 	}
 }

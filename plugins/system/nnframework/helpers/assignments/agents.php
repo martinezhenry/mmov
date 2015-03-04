@@ -3,7 +3,7 @@
  * NoNumber Framework Helper File: Assignments: Agents
  *
  * @package         NoNumber Framework
- * @version         15.1.1
+ * @version         15.2.11
  *
  * @author          Peter van Westen <peter@nonumber.nl>
  * @link            http://www.nonumber.nl
@@ -13,21 +13,18 @@
 
 defined('_JEXEC') or die;
 
-/**
- * Assignments: Browsers
- */
-class nnFrameworkAssignmentsAgents
+require_once JPATH_PLUGINS . '/system/nnframework/helpers/assignment.php';
+
+class nnFrameworkAssignmentsAgents extends nnFrameworkAssignment
 {
 	/**
 	 * passBrowsers
 	 */
-	function passBrowsers(&$parent, &$params, $selection = array(), $assignment = 'all')
+	function passBrowsers()
 	{
-		$pass = 0;
+		$pass = false;
 
-		$selection = $parent->makeArray($selection);
-
-		if (!empty($selection))
+		if (!empty($this->selection))
 		{
 			jimport('joomla.environment.browser');
 			$browser = JBrowser::getInstance();
@@ -46,7 +43,7 @@ class nnFrameworkAssignmentsAgents
 					break;
 			}
 
-			foreach ($selection as $sel)
+			foreach ($this->selection as $sel)
 			{
 				if (!$sel)
 				{
@@ -57,7 +54,7 @@ class nnFrameworkAssignmentsAgents
 				{
 					if ($this->isMobile())
 					{
-						$pass = 1;
+						$pass = true;
 						break;
 					}
 					continue;
@@ -73,21 +70,21 @@ class nnFrameworkAssignmentsAgents
 				$sel = str_replace('\.]', '\._]', $sel);
 				if (preg_match($sel . 'i', $a))
 				{
-					$pass = 1;
+					$pass = true;
 					break;
 				}
 			}
 		}
 
-		return $parent->pass($pass, $assignment);
+		return $this->pass($pass);
 	}
 
 	/**
 	 * passOS
 	 */
-	function passOS(&$parent, &$params, $selection = array(), $assignment = 'all')
+	function passOS()
 	{
-		return self::passBrowsers($parent, $params, $selection, $assignment);
+		return self::passBrowsers($this->params, $this->selection, $this->assignment);
 	}
 
 	/**

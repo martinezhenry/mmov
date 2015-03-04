@@ -3,7 +3,7 @@
  * Element: Filelist
  *
  * @package         NoNumber Framework
- * @version         15.1.1
+ * @version         15.2.11
  *
  * @author          Peter van Westen <peter@nonumber.nl>
  * @link            http://www.nonumber.nl
@@ -17,10 +17,11 @@ jimport('joomla.filesystem.folder');
 jimport('joomla.filesystem.file');
 JFormHelper::loadFieldClass('list');
 
-class JFormFieldNN_FileList extends JFormFieldList
+require_once JPATH_PLUGINS . '/system/nnframework/helpers/field.php';
+
+class JFormFieldNN_FileList extends nnFormField
 {
 	public $type = 'FileList';
-	private $params = null;
 
 	protected function getInput()
 	{
@@ -88,10 +89,5 @@ class JFormFieldNN_FileList extends JFormFieldList
 		$options = array_merge(parent::getOptions(), $options);
 
 		return $options;
-	}
-
-	private function get($val, $default = '')
-	{
-		return (isset($this->params[$val]) && (string) $this->params[$val] != '') ? (string) $this->params[$val] : $default;
 	}
 }

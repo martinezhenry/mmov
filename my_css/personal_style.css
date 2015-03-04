@@ -37,6 +37,19 @@
 
 }
 
+
+.per-form input[type="checkbox"] {
+
+	width: 100%;
+	height: 15px;
+	max-width: 180px;
+	//border: 1px solid blue;
+	border-radius: 5px;
+	//float: right;
+
+}
+
+
 .per-form select {
 
 	width: 100%;
@@ -181,3 +194,14 @@ content: attr(title);
 	margin: 0px;
 }
 
+
+.alerta {
+
+
+	border : 1px solid red;
+	background : rgba(255, 73, 73, 0.15);;
+	
+
+
+
+}

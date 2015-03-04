@@ -2,8 +2,8 @@
 <extension version="3.2" type="plugin" group="editors-xtd" method="upgrade">
 	<name>PLG_EDITORS-XTD_SOURCERER</name>
 	<description>PLG_EDITORS-XTD_SOURCERER_DESC</description>
-	<version>4.4.8FREE</version>
-	<creationDate>January 2015</creationDate>
+	<version>4.4.9FREE</version>
+	<creationDate>February 2015</creationDate>
 	<author>NoNumber (Peter van Westen)</author>
 	<authorEmail>peter@nonumber.nl</authorEmail>
 	<authorUrl>http://www.nonumber.nl</authorUrl>

@@ -115,6 +115,17 @@ jQuery(document).ready(function(){
 	//cargarBancos();
 	cargarCuentas();
 	cargarItems();
+var fechaAct = fechaActual();
+	jQuery('input[name="dat_fecha"]').datepicker(
+
+minDate: '', //Pone la fecha mínima como el día siguiente
+ maxDate: fechaAct, //Pone la fecha máxima como 10 días a partir de hoy
+ dateFormat: "dd/mm/yy", //el formato de fecha es día/mes/año (ej.: 23/10/2012)
+ constrainInput: true, //La entrada debe cumplir con el formato
+// beforeShowDay: noFinesDeSemanaNiFestivos //nuestra función que identifica fines de semana y festivos
+
+
+);
 
 	jQuery('#form_egresos').submit(function(event){
 	//alert('sub');

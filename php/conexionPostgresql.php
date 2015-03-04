@@ -59,7 +59,7 @@
 			}
 			              
 			}else{
-			            return "No hay Registros";
+			            return false;
 
 			}
 

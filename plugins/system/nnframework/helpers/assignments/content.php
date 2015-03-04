@@ -3,7 +3,7 @@
  * NoNumber Framework Helper File: Assignments: Content
  *
  * @package         NoNumber Framework
- * @version         15.1.1
+ * @version         15.2.11
  *
  * @author          Peter van Westen <peter@nonumber.nl>
  * @link            http://www.nonumber.nl
@@ -13,114 +13,111 @@
 
 defined('_JEXEC') or die;
 
-/**
- * Assignments: Content
- */
-class nnFrameworkAssignmentsContent
+require_once JPATH_PLUGINS . '/system/nnframework/helpers/assignment.php';
+
+class nnFrameworkAssignmentsContent extends nnFrameworkAssignment
 {
-	function passPageTypes(&$parent, &$params, $selection = array(), $assignment = 'all')
+	public function passPageTypes()
 	{
 		$components = array('com_content', 'com_contentsubmit');
-		if (!in_array($parent->params->option, $components))
+		if (!in_array($this->request->option, $components))
 		{
-			return $parent->pass(0, $assignment);
+			return $this->pass(false);
 		}
-		if ($parent->params->view == 'category' && $parent->params->layout == 'blog')
+		if ($this->request->view == 'category' && $this->request->layout == 'blog')
 		{
 			$view = 'categoryblog';
 		}
 		else
 		{
-			$view = $parent->params->view;
+			$view = $this->request->view;
 		}
 
-		return $parent->passSimple($view, $selection, $assignment);
+		return $this->passSimple($view);
 	}
 
-	function passCategories(&$parent, &$params, $selection = array(), $assignment = 'all', $article = 0)
+	public function passCategories()
 	{
 		// components that use the com_content secs/cats
 		$components = array('com_content', 'com_flexicontent', 'com_contentsubmit');
-		if (!in_array($parent->params->option, $components))
+		if (!in_array($this->request->option, $components))
 		{
-			return $parent->pass(0, $assignment);
+			return $this->pass(false);
 		}
 
-		$selection = $parent->makeArray($selection);
-
-		if (empty($selection))
+		if (empty($this->selection))
 		{
-			return $parent->pass(0, $assignment);
+			return $this->pass(false);
 		}
 
-		$pass = 0;
+		$pass = false;
 
-		$is_content = in_array($parent->params->option, array('com_content', 'com_flexicontent'));
-		$is_category = in_array($parent->params->view, array('category'));
-		$is_item = in_array($parent->params->view, array('', 'article', 'item'));
+		$is_content = in_array($this->request->option, array('com_content', 'com_flexicontent'));
+		$is_category = in_array($this->request->view, array('category'));
+		$is_item = in_array($this->request->view, array('', 'article', 'item'));
 
 		$inc = (
-			$parent->params->option == 'com_contentsubmit'
-			|| ($params->inc_categories && $is_content && $is_category)
-			|| ($params->inc_articles && $is_content && $is_item)
-			|| ($params->inc_others && !($is_content && ($is_category || $is_item)))
+			$this->request->option == 'com_contentsubmit'
+			|| ($this->params->inc_categories && $is_content && $is_category)
+			|| ($this->params->inc_articles && $is_content && $is_item)
+			|| ($this->params->inc_others && !($is_content && ($is_category || $is_item)))
 		);
 
 		if ($inc)
 		{
-			if ($parent->params->option == 'com_contentsubmit')
+			if ($this->request->option == 'com_contentsubmit')
 			{
 				// Content Submit
 				$contentsubmit_params = new ContentsubmitModelArticle;
-				if (in_array($contentsubmit_params->_id, $selection))
+				if (in_array($contentsubmit_params->_id, $this->selection))
 				{
-					$pass = 1;
+					$pass = true;
 				}
 			}
 			else
 			{
-				if ($params->inc_others && !($is_content && ($is_category || $is_item)))
+				if ($this->params->inc_others && !($is_content && ($is_category || $is_item)))
 				{
-					if ($article)
+					if ($this->article)
 					{
-						if (!isset($article->id))
+						if (!isset($this->article->id))
 						{
-							if (isset($article->slug))
+							if (isset($this->article->slug))
 							{
-								$article->id = (int) $article->slug;
+								$this->article->id = (int) $this->article->slug;
 							}
 						}
-						if (!isset($article->catid))
+						if (!isset($this->article->catid))
 						{
-							if (isset($article->catslug))
+							if (isset($this->article->catslug))
 							{
-								$article->catid = (int) $article->catslug;
+								$this->article->catid = (int) $this->article->catslug;
 							}
 						}
-						$parent->params->id = $article->id;
-						$parent->params->view = 'article';
+						$this->request->id = $this->article->id;
+						$this->request->view = 'article';
 					}
 				}
 
 				if ($is_category)
 				{
-					$catid = $parent->params->id;
+					$catid = $this->request->id;
 				}
 				else
 				{
-					if (!$article && $parent->params->id)
+					if (!$this->article && $this->request->id)
 					{
-						$article = JTable::getInstance('content');
-						$article->load($parent->params->id);
+						$this->article = JTable::getInstance('content');
+						$this->article->load($this->request->id);
 					}
 					$catid = JFactory::getApplication()->input->getInt('catid', JFactory::getApplication()->getUserState('com_content.articles.filter.category_id'));
-					if ($article && $article->catid)
+					if ($this->article && $this->article->catid)
 					{
-						$catid = $article->catid;
+						$catid = $this->article->catid;
 					}
-					else if ($parent->params->view == 'featured')
+					else if ($this->request->view == 'featured')
 					{
-						$menuparams = $parent->getMenuItemParams($parent->params->Itemid);
+						$menuparams = $this->getMenuItemParams($this->request->Itemid);
 						if (isset($menuparams->featured_categories))
 						{
 							$catid = $menuparams->featured_categories;
@@ -132,106 +129,89 @@ class nnFrameworkAssignmentsContent
 				{
 					if ($catid)
 					{
-						$pass = in_array($catid, $selection);
-						if ($pass && $params->inc_children == 2)
+						$pass = in_array($catid, $this->selection);
+						if ($pass && $this->params->inc_children == 2)
 						{
-							$pass = 0;
+							$pass = false;
 						}
-						else if (!$pass && $params->inc_children)
+						else if (!$pass && $this->params->inc_children)
 						{
-							$parentids = self::getParentIds($parent, $catid);
-							$parentids = array_diff($parentids, array('1'));
-							foreach ($parentids as $id)
+							$parent_ids = $this->getCatParentIds($catid);
+							$parent_ids = array_diff($parent_ids, array('1'));
+							foreach ($parent_ids as $id)
 							{
-								if (in_array($id, $selection))
+								if (in_array($id, $this->selection))
 								{
-									$pass = 1;
+									$pass = true;
 									break;
 								}
 							}
-							unset($parentids);
+							unset($parent_ids);
 						}
 					}
 				}
 			}
 		}
 
-		return $parent->pass($pass, $assignment);
+		return $this->pass($pass);
 	}
 
-	function passArticles($parent, &$params, $selection = array(), $assignment = 'all', $article = 0)
+	public function passArticles()
 	{
-		if (!$parent->params->id
-			|| !(($parent->params->option == 'com_content' && $parent->params->view == 'article')
-				|| ($parent->params->option == 'com_flexicontent' && $parent->params->view == 'item')
+		if (!$this->request->id
+			|| !(($this->request->option == 'com_content' && $this->request->view == 'article')
+				|| ($this->request->option == 'com_flexicontent' && $this->request->view == 'item')
 			)
 		)
 		{
-			return $parent->pass(0, $assignment);
+			return $this->pass(false);
 		}
 
-		$pass = 0;
+		$pass = false;
 
-		if ($selection && !is_array($selection))
+		// Pass Article Id
+		if (!$this->passItemByType($pass, 'ContentIds'))
 		{
-			if (strpos($selection, '|') !== false)
-			{
-				$selection = explode('|', $selection);
-			}
-			else
-			{
-				$selection = explode(',', $selection);
-			}
-		}
-		if (!empty($selection))
-		{
-			$pass = in_array($parent->params->id, $selection);
+			return $this->pass(false);
 		}
 
-		if ($params->keywords && !is_array($params->keywords))
+		// Pass Content Keywords
+		if (!$this->passItemByType($pass, 'ContentKeywords'))
 		{
-			$params->keywords = explode(',', $params->keywords);
-		}
-		if (!empty($params->keywords))
-		{
-			$pass = 0;
-			if (!$article)
-			{
-				require_once JPATH_SITE . '/components/com_content/models/article.php';
-				$model = JModelLegacy::getInstance('article', 'contentModel');
-				$article = $model->getItem($parent->params->id);
-			}
-			if (isset($article->metakey) && $article->metakey)
-			{
-				$keywords = explode(',', $article->metakey);
-				foreach ($keywords as $keyword)
-				{
-					if ($keyword && in_array(trim($keyword), $params->keywords))
-					{
-						$pass = 1;
-						break;
-					}
-				}
-				if (!$pass)
-				{
-					$keywords = explode(',', str_replace(' ', ',', $article->metakey));
-					foreach ($keywords as $keyword)
-					{
-						if ($keyword && in_array(trim($keyword), $params->keywords))
-						{
-							$pass = 1;
-							break;
-						}
-					}
-				}
-			}
+			return $this->pass(false);
 		}
 
-		return $parent->pass($pass, $assignment);
+		// Pass Meta Keywords
+		if (!$this->passItemByType($pass, 'MetaKeywords'))
+		{
+			return $this->pass(false);
+		}
+
+		// Pass Authors
+		if (!$this->passItemByType($pass, 'Authors'))
+		{
+			return $this->pass(false);
+		}
+
+		return $this->pass($pass);
 	}
 
-	function getParentIds(&$parent, $id = 0)
+	public function getItem($fields = array())
 	{
-		return $parent->getParentIds($id, 'categories');
+		if ($this->article)
+		{
+			return $this->article;
+		}
+
+		require_once JPATH_SITE . '/components/com_content/models/article.php';
+		$model = JModelLegacy::getInstance('article', 'contentModel');
+		$this->article = $model->getItem($this->request->id);
+
+		return $this->article;
+	}
+
+	public function getCatParentIds($id = 0)
+	{
+		return $this->getParentIds($id, 'categories');
 	}
 }

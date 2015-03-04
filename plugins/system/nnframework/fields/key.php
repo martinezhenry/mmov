@@ -4,7 +4,7 @@
  * Displays a protected key field with option to update it
  *
  * @package         NoNumber Framework
- * @version         15.1.1
+ * @version         15.2.11
  *
  * @author          Peter van Westen <peter@nonumber.nl>
  * @link            http://www.nonumber.nl
@@ -14,18 +14,27 @@
 
 defined('_JEXEC') or die;
 
-require_once JPATH_PLUGINS . '/system/nnframework/helpers/text.php';
+require_once JPATH_PLUGINS . '/system/nnframework/helpers/field.php';
 
-class JFormFieldNN_Key extends JFormField
+class JFormFieldNN_Key extends nnFormField
 {
 	public $type = 'Key';
 
 	protected function getInput()
 	{
-		$key = $this->value;
+		$this->params = $this->element->attributes();
+		$action = $this->get('action', 'Joomla.submitbutton(\'config.save.component.apply\')');
+
+		$key = trim($this->value);
+
 		if (!$key)
 		{
-			return '<input type="text" class="nn_codefield" name="' . $this->name . '" id="' . $this->id . '" autocomplete="off" value="" />';
+			return '<div id="' . $this->id . '_field" class="btn-wrapper input-append clearfix">'
+			. '<input type="text" class="nn_codefield" name="' . $this->name . '" id="' . $this->id . '" autocomplete="off" value="" />'
+			. '<button href="#" class="btn btn-success" title="' . JText::_('JAPPLY') . '" onclick="' . $action . '">'
+			. '<span class="icon-checkmark"></span>'
+			. '</button>'
+			. '</div>';
 		}
 
 		$cloak_length = max(0, strlen($key) - 4);
@@ -55,7 +64,7 @@ class JFormFieldNN_Key extends JFormField
 
 			. '<div id="' . $this->id . '_field" class="btn-wrapper input-append clearfix" style="display:none;">'
 			. '<input type="text" class="nn_codefield" name="" id="' . $this->id . '" autocomplete="off" value="" />'
-			. '<button href="#" class="btn btn-success btn" title="' . JText::_('JAPPLY') . '" onclick="Joomla.submitbutton(\'config.save.component.apply\');">'
+			. '<button href="#" class="btn btn-success btn" title="' . JText::_('JAPPLY') . '" onclick="' . $action . '">'
 			. '<span class="icon-checkmark"></span>'
 			. '</button>'
 			. '<button href="#" class="btn btn-danger btn" title="' . JText::_('JCANCEL') . '" onclick="' . $hide . ';return false;">'

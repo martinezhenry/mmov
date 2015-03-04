@@ -3,7 +3,7 @@
  * NoNumber Framework Helper File: Text
  *
  * @package         NoNumber Framework
- * @version         15.1.1
+ * @version         15.2.11
  *
  * @author          Peter van Westen <peter@nonumber.nl>
  * @link            http://www.nonumber.nl
@@ -15,6 +15,21 @@ defined('_JEXEC') or die;
 
 class nnText
 {
+	public static function fixDateOffset(&$date)
+	{
+		if ($date <= 0)
+		{
+			$date = 0;
+
+			return;
+		}
+
+		$date = JFactory::getDate($date, JFactory::getUser()->getParam('timezone', JFactory::getConfig()->get('offset')));
+		$date->setTimezone(new DateTimeZone('UTC'));
+
+		$date = $date->format('Y-m-d H:i:s', true, false);
+	}
+
 	public static function dateToDateFormat($dateFormat)
 	{
 		$caracs = array(
@@ -157,6 +172,11 @@ class nnText
 
 	public static function cleanTitle($string, $striptags = 0)
 	{
+		if (empty($string))
+		{
+			return '';
+		}
+
 		// remove comment tags
 		$string = preg_replace('#<\!--.*?-->#s', '', $string);
 
@@ -176,6 +196,10 @@ class nnText
 
 	public static function prepareSelectItem($string, $published = 1, $type = '', $remove_first = 0)
 	{
+		if (empty($string))
+		{
+			return '';
+		}
 
 		$string = str_replace(array('&nbsp;', '&#160;'), ' ', $string);
 		$string = preg_replace('#- #', '  ', $string);
@@ -246,6 +270,11 @@ class nnText
 	 */
 	public static function fixHtmlTagStructure(&$string, $remove_surrounding_p_tags = 1)
 	{
+		if (empty($string))
+		{
+			return;
+		}
+
 		// Combine duplicate <p> tags
 		nnText::combinePTags($string);
 
@@ -269,6 +298,11 @@ class nnText
 	 */
 	public static function moveDivBlocksOutsidePBlocks(&$string)
 	{
+		if (empty($string))
+		{
+			return;
+		}
+
 		$p_start_tag = '<p(?: [^>]*)?>';
 		$p_end_tag = '</p>';
 		$optional_tags = '\s*(?:<br ?/?>|<\!-- [^>]*-->|&nbsp;|&\#160;)*\s*';
@@ -283,6 +317,11 @@ class nnText
 	 */
 	public static function combinePTags(&$string)
 	{
+		if (empty($string))
+		{
+			return;
+		}
+
 		$p_start_tag = '<p(?: [^>]*)?>';
 		$optional_tags = '\s*(?:<\!-- [^>]*-->|&nbsp;|&\#160;)*\s*';
 		if (!preg_match_all('#(' . $p_start_tag . ')(' . $optional_tags . ')(' . $p_start_tag . ')#si', $string, $tags, PREG_SET_ORDER) > 0)
@@ -303,15 +342,25 @@ class nnText
 	 */
 	public static function removeSurroundingPBlocks(&$string)
 	{
+		if (empty($string))
+		{
+			return;
+		}
+
 		nnText::removeStartingPTag($string);
 		nnText::removeEndingPTag($string);
 	}
 
 	public static function removeStartingPTag(&$string)
 	{
+		if (empty($string))
+		{
+			return;
+		}
+
 		$p_start_tag = '<p(?: [^>]*)?>';
 
-		if (strpos('</p>', $string) === false || !preg_match('#^\s*' . $p_start_tag . '#si', $string))
+		if (strpos($string, '</p>') === false || !preg_match('#^\s*' . $p_start_tag . '#si', $string))
 		{
 			return;
 		}
@@ -327,6 +376,11 @@ class nnText
 
 	public static function removeEndingPTag(&$string)
 	{
+		if (empty($string))
+		{
+			return;
+		}
+
 		$p_end_tag = '</p>';
 
 		if (!preg_match('#' . $p_end_tag . '\s*$#si', $string))
@@ -388,6 +442,11 @@ class nnText
 	 */
 	public static function getAttributes($string)
 	{
+		if (empty($string))
+		{
+			return array();
+		}
+
 		if (preg_match_all('#([a-z0-9-_]+)="([^"]*)"#si', $string, $matches, PREG_SET_ORDER) < 1)
 		{
 			return array();
@@ -448,6 +507,11 @@ class nnText
 	 */
 	public static function removeDuplicateTags(&$string, $tag_type = 'p')
 	{
+		if (empty($string))
+		{
+			return;
+		}
+
 		$string = preg_replace('#(<' . $tag_type . '(?: [^>]*)?>\s*(<!--.*?-->\s*)?)<' . $tag_type . '(?: [^>]*)?>#si', '\1', $string);
 	}
 
@@ -457,6 +521,11 @@ class nnText
 	 */
 	public static function createAlias($string)
 	{
+		if (empty($string))
+		{
+			return '';
+		}
+
 		// Remove < > html entities
 		$string = str_replace(array('&lt;', '&gt;'), '', $string);
 

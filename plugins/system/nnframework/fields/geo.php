@@ -1,10 +1,9 @@
 <?php
 /**
  * Element: Geo
- * Displays a multiselectbox of geo locations
  *
  * @package         NoNumber Framework
- * @version         15.1.1
+ * @version         15.2.11
  *
  * @author          Peter van Westen <peter@nonumber.nl>
  * @link            http://www.nonumber.nl
@@ -14,18 +13,15 @@
 
 defined('_JEXEC') or die;
 
-require_once JPATH_PLUGINS . '/system/nnframework/helpers/text.php';
+require_once JPATH_PLUGINS . '/system/nnframework/helpers/field.php';
 
-class JFormFieldNN_Geo extends JFormField
+class JFormFieldNN_Geo extends nnFormField
 {
 	public $type = 'Geo';
-	private $params = null;
-	private $db = null;
 
 	protected function getInput()
 	{
 		$this->params = $this->element->attributes();
-		$this->db = JFactory::getDbo();
 
 		if (!is_array($this->value))
 		{
@@ -33,6 +29,7 @@ class JFormFieldNN_Geo extends JFormField
 		}
 
 		$group = $this->get('group', 'countries');
+
 		$options = array();
 		foreach ($this->{$group} as $key => $val)
 		{
@@ -57,11 +54,6 @@ class JFormFieldNN_Geo extends JFormField
 		require_once JPATH_PLUGINS . '/system/nnframework/helpers/html.php';
 
 		return nnHtml::selectlistsimple($options, $this->name, $this->value, $this->id, $size, $multiple);
-	}
-
-	private function get($val, $default = '')
-	{
-		return (isset($this->params[$val]) && (string) $this->params[$val] != '') ? (string) $this->params[$val] : $default;
 	}
 
 	public $continents = array(
@@ -707,6 +699,27 @@ class JFormFieldNN_Geo extends JFormField
 		'NG-43' => 'Nigeria: Taraba',
 		'NG-44' => 'Nigeria: Yobe',
 		'NG-57' => 'Nigeria: Zamfara',
+
+		'--NO'  => '', '-NO' => 'Norway',
+		'NO-01' => 'Norway: Akershus',
+		'NO-02' => 'Norway: Aust-Agder',
+		'NO-04' => 'Norway: Buskerud',
+		'NO-05' => 'Norway: Finnmark',
+		'NO-06' => 'Norway: Hedmark',
+		'NO-07' => 'Norway: Hordaland',
+		'NO-08' => 'Norway: More og Romsdal',
+		'NO-09' => 'Norway: Nordland',
+		'NO-10' => 'Norway: Nord-Trondelag',
+		'NO-11' => 'Norway: Oppland',
+		'NO-12' => 'Norway: Oslo',
+		'NO-13' => 'Norway: Ostfold',
+		'NO-14' => 'Norway: Rogaland',
+		'NO-15' => 'Norway: Sogn og Fjordane',
+		'NO-16' => 'Norway: Sor-Trondelag',
+		'NO-17' => 'Norway: Telemark',
+		'NO-18' => 'Norway: Troms',
+		'NO-19' => 'Norway: Vest-Agder',
+		'NO-20' => 'Norway: Vestfold',
 
 		'--PH'  => '', '-PH' => 'Philippines',
 		'PH-01' => 'Philippines: Abra',

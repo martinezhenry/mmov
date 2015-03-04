@@ -3,7 +3,7 @@
  * Plugin Helper File
  *
  * @package         Sourcerer
- * @version         4.4.8
+ * @version         4.4.9
  *
  * @author          Peter van Westen <peter@nonumber.nl>
  * @link            http://www.nonumber.nl
@@ -31,7 +31,7 @@ class plgSystemSourcererHelper
 
 		// Set plugin parameters
 		$this->src_params = new stdClass;
-		$this->src_params->syntax_word = $params->syntax_word;
+		$this->src_params->syntax_word = trim($params->syntax_word);
 
 		// Matches the start and end tags with everything in between
 		// Also matches any surrounding breaks and paragraph tags, to prevent unwanted empty lines in output.
@@ -520,29 +520,17 @@ class plgSystemSourcererHelper
 					{
 						$Itemid = JFactory::getApplication()->input->getInt('Itemid');
 					}
-					if (!isset($mainframe))
+					if (!isset($mainframe) || !isset($app))
 					{
-						$mainframe = JFactory::getApplication();
+						$mainframe = $app = JFactory::getApplication();
 					}
-					if (!isset($app))
+					if (!isset($document) || !isset($doc))
 					{
-						$app = JFactory::getApplication();
+						$document = $doc = JFactory::getDocument();
 					}
-					if (!isset($document))
+					if (!isset($database) || !isset($db))
 					{
-						$document = JFactory::getDocument();
-					}
-					if (!isset($doc))
-					{
-						$doc = JFactory::getDocument();
-					}
-					if (!isset($database))
-					{
-						$database = JFactory::getDBO();
-					}
-					if (!isset($db))
-					{
-						$db = JFactory::getDBO();
+						$database = $db = JFactory::getDBO();
 					}
 					if (!isset($user))
 					{

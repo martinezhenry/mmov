@@ -54,8 +54,8 @@ class JConfig {
 	public $sef_suffix = '0';
 	public $unicodeslugs = '0';
 	public $feed_limit = '10';
-	public $log_path = 'C:\\xampp\\htdocs\\Joomla3/logs';
-	public $tmp_path = 'C:\\xampp\\htdocs\\Joomla3/tmp';
+	public $log_path = '/var/www/html/mmov/logs';
+	public $tmp_path = '/var/www/html/mmov/tmp';
 	public $lifetime = '15';
 	public $session_handler = 'database';
 	public $memcache_persist = '1';
