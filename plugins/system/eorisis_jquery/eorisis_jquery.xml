@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <extension type="plugin" version="1.6.0" group="system" method="upgrade">
 
 	<title>eorisis: jQuery</title>
@@ -8,8 +8,8 @@
 	<authorEmail>info@eorisis.com</authorEmail>
 	<copyright>Copyright (C) 2012-2015 eorisis. All Rights Reserved.</copyright>
 	<license>GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html</license>
-	<version>1.3.4</version>
-	<creationDate>2 March 2015</creationDate>
+	<version>1.3.7</version>
+	<creationDate>23 March 2015</creationDate>
 	<compatibility>Joomla! 1.6 to 3.4 Series</compatibility>
 	<short_url>jquery</short_url>
 	<created>30 October 2012</created>
@@ -67,63 +67,50 @@
 				<field type="spacer" hr="true" class="eo-hr" />
 
 				<!-- Version to Use -->
-				<field name="jq_lib_version_choice" label="EO_VERSION_CHOICE_LBL" default="1" type="radio" filter="int" class="btn-group" description="EO_VERSION_CHOICE_DESC">
-					<option value="1">EO_SPECIFIC</option>
-					<option value="2">EO_CUSTOM</option>
-					<option value="0">EO_LATEST</option>
+				<field name="jq_lib_version_choice" label="EO_VERSION_CHOICE_LBL" default="1" type="radio" filter="int" class="btn-group" description="EO_JQ_LIB_VERSION_CHOICE_DESC">
+					<option value="1">EO_AUTO</option>
+					<option value="2">EO_SPECIFIC</option>
+					<option value="3">EO_CUSTOM</option>
 				</field>
 
-				<!-- CDN (Always Latest) -->
-				<field name="jq_lib_source_latest" label="EO_SOURCE_LATEST_LBL" default="1" type="list" filter="int" showon="jq_lib_version_choice:0" description="EO_SOURCE_LATEST_DESC">
-					<option value="1">EO_JQUERY_CDN</option>
-					<option value="2">EO_GOOGLE_AJAX_API_CDN</option>
+				<!-- Version (Specific) -->
+				<field name="jq_lib_version" label="EO_VERSION_LBL" default="1.11.2" type="list" showon="jq_lib_version_choice:2" description="EO_VERSION_SPECIFIC_DESC">
+					<option value="2.1.3">2.1.3</option>
+					<option value="2.1.2">2.1.2</option>
+					<option value="2.1.1">2.1.1</option>
+					<option value="2.1.0">2.1.0</option>
+					<option value="1.11.2">1.11.2 (Joomla 3.4.0-Beta1 to 3.4.1)</option>
+					<option value="1.11.1">1.11.1 (Joomla 3.3.1 to 3.4.0-Alpha)</option>
+					<option value="1.11.0">1.11.0 (Joomla 3.2.3 to 3.3.0)</option>
+					<option value="1.10.2">1.10.2 (Joomla 3.2.0 to 3.2.2)</option>
+					<option value="1.8.3">1.8.3 (Joomla 3.1.0 to 3.1.6)</option>
+					<option value="1.8.1">1.8.1 (Joomla 3.0.0 to 3.0.4)</option>
 				</field>
 
-				<!-- Source (Specific) -->
-				<field name="jq_lib_source_specific" label="EO_SOURCE_SPECIFIC_LBL" default="1" type="radio" filter="int" class="btn-group" showon="jq_lib_version_choice:1" description="EO_SOURCE_SPECIFIC_DESC">
+				<!-- Version (Custom) -->
+				<field name="jq_lib_custom_version" label="EO_VERSION_CUSTOM_LBL" size="5" type="text" class="span1" showon="jq_lib_version_choice:3" description="EO_VERSION_CUSTOM_DESC" />
+				<field name="jq_lib_custom_version_type" label="EO_VERSION_CUSTOM_TYPE_LBL" default="1" type="radio" filter="int" class="btn-group" showon="jq_lib_version_choice:3" description="EO_VERSION_CUSTOM_TYPE_DESC">
+					<option value="1">EO_MINIFIED</option>
+					<option value="0">EO_UNCOMPRESSED</option>
+				</field>
+				<field name="jq_lib_custom_local_path" label="EO_VERSION_CUSTOM_LOCAL_PATH_LBL" size="70" class="span4" type="text" showon="jq_lib_version_choice:3" description="EO_VERSION_CUSTOM_LOCAL_PATH_DESC" />
+
+				<!-- Source -->
+				<field name="jq_lib_source" label="EO_SOURCE_LBL" default="1" type="radio" filter="int" class="btn-group" description="EO_SOURCE_SPECIFIC_DESC">
 					<option value="1">EO_CDN</option>
 					<option value="2">EO_LOCAL</option>
 				</field>
 
-				<!-- CDN (Specific/Custom) -->
-				<field name="jq_lib_source_specific_cdn" label="EO_SOURCE_SPECIFIC_CDN_LBL" default="1" type="list" filter="int" showon="jq_lib_version_choice:1,2" description="EO_SOURCE_SPECIFIC_CDN_DESC">
+				<!-- CDN -->
+				<field name="jq_lib_source_cdn" label="EO_CDN_LBL" default="1" type="list" filter="int" showon="jq_lib_source:1" description="EO_SOURCE_SPECIFIC_CDN_DESC">
 					<option value="1">EO_JQUERY_CDN</option>
 					<option value="2">EO_GOOGLE_AJAX_API_CDN</option>
 					<option value="3">EO_CDNJS_CDN</option>
 					<option value="4">EO_MICROSOFT_CDN</option>
 				</field>
 
-				<!-- Version (Specific) -->
-				<field name="jq_lib_version" label="EO_VERSION_SPECIFIC_LBL" default="1.11.2" type="list" showon="jq_lib_version_choice:1" description="EO_VERSION_SPECIFIC_DESC">
-					<option value="2.1.3">2.1.3</option>
-					<option value="2.1.2">2.1.2</option>
-					<option value="2.1.1">2.1.1</option>
-					<option value="2.1.0">2.1.0</option>
-					<option value="1.11.2">1.11.2 (Joomla 3.4.0)</option>
-					<option value="1.11.1">1.11.1 (Joomla 3.3.1 to 3.4.0 Alpha)</option>
-					<option value="1.11.0">1.11.0 (Joomla 3.2.3 to 3.3.0)</option>
-					<option value="1.10.2">1.10.2 (Joomla 3.2.0 to 3.2.2)</option>
-					<option value="1.10.1">1.10.1</option>
-					<option value="1.10.0">1.10.0</option>
-					<option value="1.9.1">1.9.1</option>
-					<option value="1.9.0">1.9.0</option>
-					<option value="1.8.3">1.8.3 (Joomla 3.1.0 to 3.1.6)</option>
-					<option value="1.8.2">1.8.2</option>
-					<option value="1.8.1">1.8.1 (Joomla 3.0.0 to 3.0.4)</option>
-				</field>
-
-				<field type="spacer" hr="true" class="eo-hr" />
-
-				<!-- Version (Custom) -->
-				<field name="jq_lib_custom_version" label="EO_VERSION_CUSTOM_LBL" size="5" type="text" class="span1" showon="jq_lib_version_choice:2" description="EO_VERSION_CUSTOM_DESC" />
-				<field name="jq_lib_custom_version_type" label="EO_VERSION_CUSTOM_TYPE_LBL" default="1" type="radio" filter="int" class="btn-group" showon="jq_lib_version_choice:2" description="EO_VERSION_CUSTOM_TYPE_DESC">
-					<option value="1">EO_MINIFIED</option>
-					<option value="0">EO_UNCOMPRESSED</option>
-				</field>
-				<field type="spacer" hr="true" class="eo-hr" showon="jq_lib_version_choice:2" />
-
 				<!-- CDN Fallback -->
-				<field name="jq_lib_cdn_fallback" label="EO_CDN_FALLBACK_LBL" default="0" type="radio" class="btn-group" filter="int" description="EO_CDN_FALLBACK_DESC">
+				<field name="jq_lib_cdn_fallback" label="EO_CDN_FALLBACK_LBL" default="0" type="radio" class="btn-group" filter="int" showon="jq_lib_source:1" description="EO_CDN_FALLBACK_DESC">
 					<option value="1">JENABLED</option>
 					<option value="0">JDISABLED</option>
 				</field>
@@ -144,7 +131,7 @@
 
 				<!-- Version -->
 				<field name="migrate_version" label="EO_VERSION_LBL" default="1.2.1" type="radio" class="btn-group">
-					<option value="1.2.1">1.2.1 (Joomla 3.2.0 to 3.4.0)</option>
+					<option value="1.2.1">1.2.1 (Joomla 3.2.0 to 3.4.1)</option>
 				</field>
 
 				<!-- Source -->
@@ -226,18 +213,25 @@
 
 				<field type="spacer" hr="true" class="eo-hr" />
 
+				<!-- Version to Use -->
+				<field name="ui_version_choice" label="EO_VERSION_CHOICE_LBL" default="1" type="radio" filter="int" class="btn-group" description="EO_VERSION_CHOICE_DESC">
+					<option value="1">EO_AUTO</option>
+					<option value="2">EO_SPECIFIC</option>
+				</field>
+
 				<!-- Version -->
-				<field name="ui_version" label="EO_VERSION_LBL" default="1.9.2" type="list" description="EO_UI_VERSION_DESC">
+				<field name="ui_version" label="EO_VERSION_LBL" default="1.9.2" type="list" showon="ui_version_choice:2" description="EO_UI_VERSION_DESC">
+					<option value="1.11.4">1.11.4</option>
 					<option value="1.11.3">1.11.3</option>
 					<option value="1.11.2">1.11.2</option>
 					<option value="1.11.1">1.11.1</option>
 					<option value="1.11.0">1.11.0</option>
-					<option value="1.9.2">1.9.2 (Joomla 3.2.0 to 3.4.0)</option>
+					<option value="1.9.2">1.9.2 (Joomla 3.2.0 to 3.4.1)</option>
 					<option value="1.8.23">1.8.23 (Joomla 3.0.0 to 3.1.6)</option>
 				</field>
 
 				<!-- Source -->
-				<field name="ui_source" label="EO_SOURCE_LBL" default="1" type="radio" filter="int" class="btn-group" description="EO_UI_THEME_DESC">
+				<field name="ui_source" label="EO_SOURCE_LBL" default="1" type="radio" filter="int" class="btn-group" description="EO_SOURCE_DESC">
 					<option value="1">EO_CDN</option>
 					<option value="2">EO_LOCAL</option>
 				</field>
@@ -302,8 +296,15 @@
 
 				<field type="spacer" hr="true" class="eo-hr" />
 
+				<!-- Version to Use -->
+				<field name="tb_version_choice" label="EO_VERSION_CHOICE_LBL" default="1" type="radio" filter="int" class="btn-group" description="EO_VERSION_CHOICE_DESC">
+					<option value="1">EO_AUTO</option>
+					<option value="2">EO_SPECIFIC</option>
+				</field>
+
 				<!-- Version -->
-				<field name="tb_version" label="EO_VERSION_LBL" default="2.3.2" type="list" description="EO_BOOTSTRAP_DESC">
+				<field name="tb_version" label="EO_VERSION_LBL" default="2.3.2" type="list" showon="tb_version_choice:2" description="EO_BOOTSTRAP_DESC">
+					<option value="3.3.4">3.3.4</option>
 					<option value="3.3.2">3.3.2</option>
 					<option value="3.3.1">3.3.1</option>
 					<option value="3.3.0">3.3.0</option>
@@ -353,13 +354,17 @@
 
 				<field type="spacer" hr="true" class="eo-hr" />
 
+				<!-- Version to Use -->
+				<field name="chosen_version_choice" label="EO_VERSION_CHOICE_LBL" default="1" type="radio" filter="int" class="btn-group" description="EO_VERSION_CHOICE_DESC">
+					<option value="1">EO_AUTO</option>
+					<option value="2">EO_SPECIFIC</option>
+				</field>
+
 				<!-- Version -->
-				<field name="chosen_version" label="EO_VERSION_LBL" default="0.9.12" type="list" description="EO_CHOSEN_JS_VERSION_DESC">
-					<option value="1.3.0">1.3.0</option>
-					<option value="1.2.0">1.2.0</option>
-					<option value="1.1.0">1.1.0</option>
-					<option value="1.0.0">1.0.0</option>
-					<option value="0.9.12">0.9.12 (Joomla 3.2.2 to 3.4.0)</option>
+				<field name="chosen_version" label="EO_VERSION_LBL" default="0.9.12" type="list" showon="chosen_version_choice:2" description="EO_CHOSEN_JS_VERSION_DESC">
+					<option value="1.4.1">1.4.1</option>
+					<option value="1.4.0">1.4.0</option>
+					<option value="0.9.12">0.9.12 (Joomla 3.2.2 to 3.4.1)</option>
 				</field>
 
 				<!-- Source -->
@@ -396,7 +401,7 @@
 				<field type="spacer" hr="true" class="eo-hr" />
 
 				<!-- Version -->
-				<field name="easing_version" label="EO_VERSION_LBL" type="radio" class="btn-group">
+				<field name="easing_version" label="EO_VERSION_LBL" default="1.3" type="radio" class="btn-group">
 					<option value="1.3">1.3</option>
 				</field>
 
@@ -552,7 +557,7 @@
 					<option value="1">JENABLED</option>
 					<option value="0">JDISABLED</option>
 				</field>
-				<field name="curl_useragent_txt" label="EO_UA_TXT_LBL" default="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:35.0) Gecko/20100101 Firefox/35.0" size="75" type="text" class="span5" showon="curl_useragent:1" description="EO_UA_TXT_DESC" />
+				<field name="curl_useragent_txt" label="EO_UA_TXT_LBL" default="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:36.0) Gecko/20100101 Firefox/36.0" size="75" type="text" class="span5" showon="curl_useragent:1" description="EO_UA_TXT_DESC" />
 
 			</fieldset><!-- /Advanced -->
 

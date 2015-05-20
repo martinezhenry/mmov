@@ -1,5 +1,18 @@
 <?php
 
+/************************************************************************
+*									*
+*  Archivo : cargar_datos.php						*
+*  Desarrollador: Henry Martinez.					*
+*  Fecha: Marzo 2015.							*
+*  Contenido: Metodos para consultar datos para los procesos		*
+*	      de MMOV							*
+*									*
+************************************************************************/
+
+/* FUNCTION CARGAR LOS DATOS DE LOS BANCOS
+	RETURN : ARRAY
+ */
 
 function cargarBancos(){
 
@@ -17,6 +30,9 @@ return $filas;
 
 }
 
+/* FUNCTION CARGAR LOS DATOS DE LAS CUENTAS
+	RETURN : ARRAY
+ */
 
 function cargarCuentas(){
 
@@ -34,22 +50,31 @@ return $filas;
 
 }
 
+/* FUNCTION CARGAR LOS DATOS DE LOS ITEMS
+	RETURN : ARRAY
+ */
+
 
 function cargarItems(){
 
 
-require 'conexionPostgresql.php';
+require_once 'conexionPostgresql.php';
 $psql = new Conexion();
 
 
 
-$query = "select idtipos_items, item from tipos_items order by 2 asc";
+$query = "select idtipos_items, item from tipos_items where estatus='A' order by 2 asc";
 
 $filas = $psql->consulta($query);
 //$filas = 1;
 return $filas;
 
 }
+
+/* FUNCTION CARGAR LOS DATOS DE LOS PDVS
+	RETURN : ARRAY
+ */
+
 
 function cargarPdvs($ruta = null){
 
@@ -71,6 +96,12 @@ $filas = $psql->consulta($query);
 return $filas;
 
 }
+
+
+/* FUNCTION CARGAR LOS DATOS DE LOS DTI
+	RETURN : ARRAY
+ */
+
 
 function cargarDti($ruta = null){
 
@@ -99,6 +130,9 @@ return $filas;
 
 }
 
+/* FUNCTION CARGAR LOS DATOS DE LAS FORMAS DE PAGO
+	RETURN : ARRAY
+ */
 
 function cargarFormasPago(){
 
@@ -118,6 +152,11 @@ return $filas;
 }
 
 
+/* FUNCTION CARGAR LOS DATOS DE LOS PRODUCTOS
+	RETURN : ARRAY
+ */
+
+
 function cargarProductos(){
 
 
@@ -134,6 +173,11 @@ return $filas;
 
 
 }
+
+
+/* FUNCTION CARGAR LOS DATOS DE LOS SUPERVISORES
+	RETURN : ARRAY
+ */
 
 
 function cargarSupervisor(){
@@ -158,6 +202,11 @@ return $filas;
 }
 
 
+/* FUNCTION CARGAR LOS DATOS DE LAS RUTAS
+	RETURN : ARRAY
+ */
+
+
 function cargarRutas(){
 
 
@@ -177,6 +226,10 @@ return $filas;
 }
 
 
+/* FUNCTION CARGAR LOS DATOS DE LOS EMPLEADOS
+	RETURN : ARRAY
+ */
+
 
 function cargarEmpleados(){
 
@@ -184,7 +237,7 @@ function cargarEmpleados(){
 require 'conexionPostgresql.php';
 $psql = new Conexion();
 
-echo $query;
+//echo $query;
 
 $query = "select a.idempleados || '*' || personas_idpersonas as idempleados, b.nombre || ' ' || b.apellido as nombre from empleados a, personas b where a.personas_idpersonas = b.idpersonas
  	order by 2 asc";
@@ -198,6 +251,37 @@ return $filas;
 
 }
 
+
+/* FUNCTION CARGAR LOS DATOS DE LOS PROCESOS
+	RETURN : ARRAY
+ */
+
+
+function cargarProcesos($id = null){
+
+if ($id == null){
+
+	$sql = "select idarchivos, nombre from archivos";
+	
+} else {
+
+	$sql = "select idarchivos, nombre from archivos where idarchivos = '".$id."'";
+
+}
+
+
+	require_once "conexionPostgresql.php";
+	$psql = new Conexion();
+$filas = $psql->consulta($sql);
+//$filas = 1;
+return $filas;
+
+
+}
+
+
+
+/* AREA DONDE SE SELECCIONA LA FUNCCION QUE SE EJECUTARA SEGUN LA SOLICITUD DEL USUARIO */
 
 if (isset($_POST['cargarBancos'])){
 
@@ -369,6 +453,14 @@ if (isset($_POST['cargarBancos'])){
 		echo "1";
 
 	}
+} else if (isset($_POST['cargarProcesos'])){
+
+	$r = cargarProcesos();
+
+	if (!$r){
+	echo "-1";
+	} else { echo json_encode($r); }
+
 }
 
 

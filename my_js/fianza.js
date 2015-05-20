@@ -43,6 +43,44 @@ jQuery.ajax({
 
 jQuery(document).ready(function(){
 
+	
+	jQuery('input[name="dat_fecha_comision"]').datepicker({
+
+changeMonth: true,
+ changeYear: true,
+ changeDay: false,
+ showButtonPanel: true,
+ dateFormat: 'mm/yy'	
+	});
+
+	jQuery('input[name="tex_monto"]').numeric('.');
+
+
+
 	cargarDti();
+
+
+	jQuery('#form_fianza').submit(function(){
+
+		var salida = true;
+
+	jQuery('select:enabled').each(function(idx){
+
+		if (jQuery(this).val() == '-1'){
+			alert('Debe Seleccionar todos los campos');
+			jQuery(this).attr('class', 'alerta');
+			salida = false;
+			return false;
+		} else {
+			jQuery(this).removeAttr('class');
+		}
+
+		
+	});
+	return salida;
+
+});
+
+
 
 });

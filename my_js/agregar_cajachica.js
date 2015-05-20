@@ -50,7 +50,7 @@ var fechaAct = fechaActual();
 
 	html += "<tr id=\"fil_" + fila + "\" >";
 	html += "<td> " + fila + " </td>";
-	html += "<td> <input type='text' name='dat_fecha[]' value='" + fechaAct + "' /> </td>";
+	html += "<td> <input readonly type='text' name='dat_fecha[]' value='" + fechaAct + "' /> </td>";
 	html += "<td> <input type='text' onblur=\"validarNota(this.value, 'fil_"+fila+"');\" name='tex_num_factura[]' required /> </td>";
 	html += "<td> <input type='text' name='tex_concepto[]' required /> </td>";
 	html += "<td> <input type='text' name='tex_monto[]' placeholder='0.00' onkeyUp=\"exento('false', 'fil_"+fila+"');\" required /> </td>";
@@ -71,9 +71,9 @@ var fechaAct = fechaActual();
 	jQuery('input[name="tex_monto[]"]').numeric(".");
 	jQuery('input[name="tex_num_factura[]"]').numeric(false);
 	
-	ultimaCajaChica(function(minFecha){
+	/*ultimaCajaChica(function(minFecha){
 
-		jQuery('input[name="dat_fecha[]"]').datepicker({
+		jQuery('#fil_'+ fila  +' input[name="dat_fecha[]"]').datepicker({
 minDate: minFecha , //Pone la fecha mínima como el día siguiente
  maxDate: fechaAct, //Pone la fecha máxima como 10 días a partir de hoy
  dateFormat: "dd/mm/yy", //el formato de fecha es día/mes/año (ej.: 23/10/2012)
@@ -82,10 +82,16 @@ minDate: minFecha , //Pone la fecha mínima como el día siguiente
 
 });
 
+
+
+
 });
+*/
+
+jQuery('#fil_'+ fila  +' input[name="dat_fecha[]"]').datepicker();
 
 
-
+jQuery('#fil_'+ fila  +' input[name="tex_num_factura[]"]').focus();
 
 
 
@@ -124,13 +130,42 @@ function eliminaItem(id){
 
 
 	jQuery('#tab_gastosCajaChica tbody tr').each(function(index){
-	var nuevoid = 'fil_' + (index+1);
+	
+		var nuevoid = 'fil_' + (index+1);
 		jQuery(this).attr('id', nuevoid );
+		jQuery('#' + nuevoid + ' td > #img_eliminar').attr('onclick', 'eliminaItem(\''+nuevoid+'\')' );
 		jQuery('#' + nuevoid + ' td:first').html( (index+1) );
 
+
 	});
+
+	if (jQuery('#tab_gastosCajaChica tbody tr').length == 0){	
+		jQuery('input[name="sub_guardar"]').attr('disabled', 'disabled');
+	}
+
 	
 }
+
+
+
+function eliminaItem_e(id){
+	//alert(id);
+	
+	if (confirm('Seguro que desea eliminar este item? No podrá revertir este cambio.')){
+
+	jQuery('#' + id).css('display', 'none');
+	jQuery('#' + id + ' input[name="accion_e[]"]').val('1');
+}
+
+	
+
+	if (jQuery('#tab_gastosCajaChica tbody tr:visible').length == 0){	
+		jQuery('input[name="sub_guardar"]').attr('disabled', 'disabled');
+	}
+
+	
+}
+
 
 
 function validarNota(nota, fila){
@@ -277,11 +312,52 @@ if (monto == ""){ return; }
 }
 
 
+
+
+function exento_e(check, fila){
+
+if (check == 'false'){
+
+	check = jQuery('#'+fila+ ' input[name="che_exento_e[]"]').is(':checked');
+//alert('entra');
+}
+
+//alert(check)
+
+var monto = jQuery('#'+fila+ ' input[name="tex_monto_e[]"]').val();
+
+if (monto == ""){ return; }
+
+	if(check == true){
+
+		//alert('exento');
+
+	
+	jQuery('#'+fila+ ' input[name="tex_exento_e[]"]').val(monto);
+		jQuery('#'+fila+ ' input[name="tex_iva_e[]"]').val('0.00');
+		jQuery('#'+fila+ ' input[name="tex_base_e[]"]').val('0.00');
+	
+	} else {
+		//alert('no exento');
+
+		var iva = calculoIva(jQuery('#'+fila+ ' input[name="tex_monto_e[]"]').val());
+
+		jQuery('#'+fila+ ' input[name="tex_iva_e[]"]').val(iva.toFixed(2));
+		jQuery('#'+fila+ ' input[name="tex_base_e[]"]').val((monto-iva).toFixed(2));
+		jQuery('#'+fila+ ' input[name="tex_exento_e[]"]').val('0.00');
+
+
+	}
+
+}
+
+
+
 function calculoIva(monto){
 
 	//var base = monto/0.12;
 
-	var iva = monto*0.12;
+	var iva = (monto/1.12)*0.12;
 
 	return iva;
 
@@ -289,7 +365,7 @@ function calculoIva(monto){
 
 
 function validar(){
-
+var salida = true;
 
 var fecha = jQuery('input[name="dat_fecha_repo"]').val();
 //alert(fecha);
@@ -302,7 +378,7 @@ jQuery('select[name="sel_item[]"]').each(function (idx){
 		alert('Debe Seleccionar un item para el gasto.');
 		jQuery(this).focus();
 		jQuery(this).attr("class","alerta");
-		return false;
+		salida = false;
 
 	} else{
 		jQuery(this).removeAttr("class");
@@ -314,6 +390,9 @@ jQuery('select[name="sel_item[]"]').each(function (idx){
 
 
 });
+
+
+if(!salida){ return false; }
 
 
 jQuery('form[name="form_cajaChica"] .alerta').each(function(idx){
@@ -336,26 +415,91 @@ return true;
 
 
 
-jQuery(document).ready(function(){
+function cargarEdiciones(id){
+//alert('editar');
+	jQuery.ajax({
+
+
+	type : 'post',
+	url : '../../php/reposicion_caja_chica.php',
+	data : { cargarEdiciones : 1, id : id },
+	success : function(resp){
+		//alert(resp);
+		
+
+		var r = resp.split('***');
+		jQuery('#tab_gastosCajaChica').append(r[0]);
+		jQuery('input[name="dat_fecha_repo"]').val(r[1]);
+
+		jQuery('input[name="iditem"]').each(function(idx){
+			
+			var x = jQuery(this).attr('id');
+			
+			x = x.replace('iditem_', '');
+
+			
+			jQuery('#sel_item_'+x).val(jQuery(this).val());
+
+		});
+
+		jQuery('input[name="tex_accion"]').val('editar');
+
+		jQuery('#form_cajaChica').attr('action', jQuery('#form_cajaChica').attr('action') + '?id=' + id);
+
+		if (jQuery('#tab_gastosCajaChica tbody tr').length > 0){
+			jQuery('input[name="sub_guardar"]').removeAttr('disabled');
+		}
+
+	}
+
+
+});
+
+}
+
+
+
+$(document).ready(function(){
 
 	jQuery("#img_agregar").click(function(){
 		agregarItem();
+
+		
+		jQuery('input[name="sub_guardar"]').removeAttr('disabled');
 		
 
 
 	});
+
+
+	
 	
 	//jQuery( "#dat_fecha_repo" ).datepicker();
 	jQuery( "#dat_fecha_repo" ).val(fechaActual());
 
 	jQuery('form[name="form_cajaChica"]').submit(function(){
 
-	alert('submit');
+	//alert('submit');
 	return validar();
 	//return resp;
 
 
 	});
+
+		
+	var get = getGET();
+
+	if (typeof(get['pag']) != "undefined"){
+
+		//alert('editar');
+		//alert(get['pag']);
+	
+		cargarEdiciones(get['pag']);
+
+
+	} else{
+		//alert('no editar');
+	}
 
 	
 

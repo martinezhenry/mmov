@@ -36,13 +36,24 @@ class JFormFieldInfo extends JFormField
 
 	protected function getInput()
 	{
-		if (!JFactory::getApplication()->isAdmin()) { return; }
+		$app = JFactory::getApplication();
+		if (!$app->isAdmin()) { return; }
 
 		//	--------------------------------------------------
 
 		$app_dir = 'eorisis_jquery';
 		$app_url = 'eorisis-jquery';
 		$app_type = 'plugin';
+
+		//	--------------------------------------------------
+
+		//	Joomla 3.2.4 showon fields
+		//	Joomla 3.3.1 fieldset descriptions
+		if (version_compare(JVERSION, '3.3.1', '<'))
+		{
+			$msg = JText::_('EO_JVERSION_OLD').' '.JVERSION.'. '.JText::_('EO_JUPGRADE');
+			$app->enqueueMessage($msg, 'warning');
+		}
 
 		//	--------------------------------------------------
 
@@ -57,9 +68,13 @@ class JFormFieldInfo extends JFormField
 		$css = $this->read_file($framework_admin.'css/styles.css');
 
 		if (version_compare(JVERSION, 3, '>='))
-		{ $css .= '.eo-hr { width:220px;border-top:1px solid #eee; }'; }
+		{
+			$css .= '.eo-hr { width:220px;border-top:1px solid #eee; }';
+		}
 		else
-		{ $css .= '.eo-hr { display:block;color:#ddd;background:#eee;border:0; }'; }
+		{
+			$css .= '.eo-hr { display:block;color:#ddd;background:#eee;border:0; }';
+		}
 
 		$css .= '.eo-hr { clear:both;height:1px;font-size:0;margin:5px 0; }';
 		$css .= '.eo-help label { color:#ec8824; }';
@@ -73,11 +88,11 @@ class JFormFieldInfo extends JFormField
 			$this->xml = $xml;
 
 			$js = $this->read_file($framework_admin.'js/script.js');
-			$js = str_replace('*jquery_version*', (string)$xml->jquery_version, $js);
-			$js = str_replace('*migrate_version*', (string)$xml->migrate_version, $js);
-			$js = str_replace('*app_url*', $app_url, $js);
-			$js = str_replace('*app_type*', $app_type, $js);
-			$js = str_replace('*update_site_url*', (string)$xml->authorUrl.'/updates', $js);
+			$js = str_replace('|jquery_version|', (string)$xml->jquery_version, $js);
+			$js = str_replace('|migrate_version|', (string)$xml->migrate_version, $js);
+			$js = str_replace('|app_url|', $app_url, $js);
+			$js = str_replace('|app_type|', $app_type, $js);
+			$js = str_replace('|update_site_url|', (string)$xml->authorUrl.'/updates', $js);
 			$doc->addScriptDeclaration($js);
 
 			//	--------------------------------------------------

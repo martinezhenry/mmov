@@ -22,6 +22,8 @@ defined('_JEXEC') or die;
 
 class plgSystemEorisis_jQueryInstallerScript
 {
+	protected $J3;
+	protected $current_path;
 	protected $xml;
 	protected $attributes;
 	protected $client_id;
@@ -48,6 +50,7 @@ class plgSystemEorisis_jQueryInstallerScript
 	protected $new_jversion;
 	protected $db;
 	protected $ext_params;
+	protected $update_multi;
 
 	//	--------------------------------------------------
 
@@ -138,23 +141,23 @@ class plgSystemEorisis_jQueryInstallerScript
 
 				//	--------------------------------------------------
 
-				$app_link = '<a href="http://eorisis.com/'.$this->short_url.'" target="_blank" title="'.JText::_('JBROWSERTARGET_NEW').'">eorisis.com/'.$this->short_url.'</a>';
+				$changelog_link = 'eorisis.com/'.$this->short_url.'/changelog';
+				$changelog_link = '<a href="http://'.$changelog_link.'" target="_blank" title="'.JText::_('JBROWSERTARGET_NEW').'">'.$changelog_link.'</a>';
 				$this->thanks = 'Thanks for choosing eorisis.';
 
-				$html  = '<div class="alert alert-info">';
-				$html .=	'<p>';
-				$html .=		'<strong>Software '.$setup_text.' Complete.</strong><br />';
-				$html .=		$version_text.'<br />';
-				$html .=		'Method Used: '.$method.'<br />';
-				$html .=		'Changelog: <strong>'.$app_link.'</strong><br />';
-				$html .=		'<br />';
-				$html .=		$go_to_app.'<br />';
-				$html .=		$enable_app;
-				$html .=		'<br />';
-				$html .=		$this->thanks.'<br />';
-				$html .=		$this->copyright;
-				$html .=	'</p>';
-				$html .= '</div>';
+				$html  = '<p>';
+				$html .=	'<strong>'.$this->app_title.' ('.ucfirst($this->app_group).' '.ucfirst($this->app_type).')</strong> '.$setup_text.' Complete.<br />';
+				$html .=	$version_text.'<br />';
+				$html .=	'Method Used: '.$method.'<br />';
+				$html .=	'Changelog: <strong>'.$changelog_link.'</strong><br />';
+				$html .=	'<br />';
+				$html .=	$go_to_app.'<br />';
+				$html .=	$enable_app;
+				$html .=	"(After an Install, Update or Uninstall, clear your Joomla! and browser's cache)<br />";
+				$html .=	'<br />';
+				$html .=	$this->thanks.'<br />';
+				$html .=	$this->copyright;
+				$html .= '</p>';
 				$this->html = $html;
 			}
 			else
@@ -174,201 +177,55 @@ class plgSystemEorisis_jQueryInstallerScript
 
 	function install($parent)
 	{
-		echo $this->html;
+		$this->system_message();
 	}
 
 	//	--------------------------------------------------
 
 	function update($parent)
 	{
-		$notice = "After a ".ucfirst($this->app_type)." Update, clear your Joomla! and browser's cache.";
-		JFactory::getApplication()->enqueueMessage($notice, 'notice');
-		echo $this->html;
+		if ($this->update_multi)
+		{
+			$this->html .= '<hr>';
+		}
+
+		$this->system_message();
+	}
+
+	//	--------------------------------------------------
+
+	function uninstall($parent)
+	{
+		//	Uninstall cannot cause an abort of the Joomla uninstall action, so returning false would be a waste of time
 	}
 
 	//	--------------------------------------------------
 
 	function postflight($type, $parent)
 	{
-		//	Executed after Install or Update. Not after uninstall
+		//	postflight() Executed after Install or Update. Not after uninstall
 		//	--------------------------------------------------
 
 		$type = strtolower($type); // important
 
+		//	--------------------------------------------------
+
 		if ($this->version_upgrade)
 		{
-			//	--------------------------------------------------
-			//	Changes in version 1.2.0 :: Set new param names
+			$versions = array(
+				'1.2.0',
+				'1.3.0',
+				'1.3.3',
+				'1.3.7'
+			);
 
-			if ($this->version_update('1.2.0'))
+			foreach ($versions as $version)
 			{
-				foreach ($this->ext_params as $name => $value)
+				if ($this->version_update($version))
 				{
-					if (strpos($name, 'jq_lib_') === 0)
-					{
-						continue;
-					}
-
-					$new_name = null;
-
-					if ($name == 'jquery_load_area')
-					{
-						$new_name = 'jq_lib_area';
-					}
-					elseif ($name == 'jquery_ui_load_area')
-					{
-						$new_name = 'ui_area';
-					}
-					else
-					{
-						if (strpos($name, 'jq_') === 0)
-						{
-							$new_name = str_replace('jq_', '', $name);
-						}
-
-						if (strpos($name, '_load_area') !== false)
-						{
-							if ($new_name)
-							{
-								$change_name = $new_name;
-							}
-							else
-							{
-								$change_name = $name;
-							}
-
-							$new_name = str_replace('_load_area', '_area', $change_name);
-						}
-						elseif ($name == 'ui_css_media')
-						{
-							if ($new_name)
-							{
-								$change_name = $new_name;
-							}
-							else
-							{
-								$change_name = $name;
-							}
-
-							$new_name = str_replace('css_media', 'css_media_type', $change_name);
-						}
-					}
-
-					if ($new_name)
-					{
-						$this->ext_params->$new_name = $this->ext_params->$name;
-						unset($this->ext_params->$name);
-					}
+					require_once($this->current_path.'/updates/'.$version.'/update.php');
 				}
 			}
-
-			//	--------------------------------------------------
-			//	Changes in version 1.3.0 :: Set new param names/values
-
-			if ($this->version_update('1.3.0'))
-			{
-				$names = array(
-					'local_urls_js',
-					'local_urls_css'
-				);
-
-				foreach ($this->ext_params as $name => $value)
-				{
-					$new_value = null;
-
-					if (in_array($name, $names))
-					{
-						switch ($value)
-						{
-							case '0': $new_value = 1; break;
-							case '1': $new_value = 2; break;
-							case '2': $new_value = 3; break;
-							default: $new_value = 1;
-						}
-
-						$this->ext_params->$name = $new_value;
-					}
-					else
-					{
-						switch ($name)
-						{
-							case 'jq_lib_version_custom':
-							{
-								$this->ext_params->jq_lib_custom_version = $this->ext_params->$name;
-								unset($this->ext_params->$name);
-
-							} break;
-
-							case 'jq_lib_version_custom_type':
-							{
-								$this->ext_params->jq_lib_custom_version_type = $this->ext_params->$name;
-								unset($this->ext_params->$name);
-
-							} break;
-
-							case 'ui_elem':
-							{
-								if ($value == 'js_css')
-								{
-									$this->ext_params->$name = 'all';
-								}
-
-							} break;
-						}
-					}
-				}
-			}
-
-			//	--------------------------------------------------
-			//	Changes in version 1.3.3 :: Set new param names/values
-
-			if ($this->version_update('1.3.3'))
-			{
-				$names = array(
-					'jq_lib_source_specific',
-					'migrate_source',
-					'ui_source',
-					'tb_source',
-					'chosen_source',
-					'easing_source'
-				);
-
-				foreach ($this->ext_params as $name => $value)
-				{
-					if (in_array($name, $names))
-					{
-						if ($value == '0')
-						{
-							$this->ext_params->$name = 2;
-						}
-					}
-					else
-					{
-						switch ($name)
-						{
-							case 'jq_lib_custom_version_type':
-							{
-								if ($value == '2')
-								{
-									$this->ext_params->$name = '0';
-								}
-
-							} break;
-
-							case 'local_urls_js':
-							{
-								$this->ext_params->local_urls = $this->ext_params->$name;
-								unset($this->ext_params->$name);
-
-							} break;
-
-							case 'local_urls_css': unset($this->ext_params->$name); break;
-						}
-					}
-				}
-			}
-
-			//	--------------------------------------------------
 
 			if ($this->ext_params)
 			{
@@ -379,7 +236,7 @@ class plgSystemEorisis_jQueryInstallerScript
 
 		//	--------------------------------------------------
 
-		//	Re-enable the eorisis update sites in case they were disabled
+		//	Re-enable the eorisis update sites in case they were disabled (bad connection or server down)
 		$this->enable_update_sites();
 	}
 
@@ -387,6 +244,8 @@ class plgSystemEorisis_jQueryInstallerScript
 
 	protected function get_extension_details($parent)
 	{
+		$this->J3 = version_compare(JVERSION, 3, '>=');
+		$this->current_path = dirname(__FILE__);
 		$this->xml = $parent->get('manifest');
 		$this->element = (string)$this->xml->name;
 
@@ -454,42 +313,46 @@ class plgSystemEorisis_jQueryInstallerScript
 
 	protected function install_type()
 	{
-		$install_type = 'unknown';
+		$install_type = null;
 
 		if (isset($_POST['task']))
 		{
-			if (version_compare(JVERSION, 3, '>='))
+			$task = $_POST['task'];
+			if ($this->J3 or (isset($_POST['option']) and ($_POST['option'] == 'com_installer')))
 			{
-				if (($_POST['task'] == 'install.install') and isset($_POST['installtype']))
+				//	J3.x task: install.install
+				//	J2.x task: install
+				if ((($task == 'install.install') or ($task == 'install')) and isset($_POST['installtype']))
 				{
-					$install_type = preg_replace('/[^a-z]+/', '', $_POST['installtype']); // upload, folder, url
+					$install_type = $_POST['installtype']; // upload, folder, url
 				}
-				elseif (($_POST['task'] == 'update.update') and isset($_POST['boxchecked']) and ($_POST['boxchecked'] == 1))
+
+				//	J3.x task: update.update
+				//	J2.x task: update
+				elseif ((($task == 'update.update') or ($task == 'update')) and isset($_POST['boxchecked']))
 				{
-					$install_type = 'update';
-				}
-			}
-			elseif (isset($_POST['option']) and ($_POST['option'] == 'com_installer'))
-			{
-				if (($_POST['task'] == 'install') and isset($_POST['installtype']))
-				{
-					$install_type = preg_replace('/[^a-z]+/', '', $_POST['installtype']); // upload, folder, url
-				}
-				elseif (($_POST['task'] == 'update') and isset($_POST['boxchecked']) and ($_POST['boxchecked'] == 1))
-				{
-					$install_type = 'update';
+					if ($_POST['boxchecked'] == 1)
+					{
+						$install_type = 'update';
+					}
+					elseif ($_POST['boxchecked'] > 1)
+					{
+						$this->update_multi = true;
+						$install_type = 'update_multi';
+					}
 				}
 			}
 		}
 
-		//	discover_install is not firing the intaller possibly due to a Joomla bug
+		//	discover_install is NOT firing the intaller
 		switch ($install_type)
 		{
-			case 'update'	: return 'Joomla Update';
-			case 'upload'	: return 'Upload Package File (File Upload)';
-			case 'folder'	: return 'Install from Directory';
-			case 'url'		: return 'Install from URL';
-			case 'unknown'	: return 'Unknown';
+			case 'update'		: return 'Joomla Update';
+			case 'update_multi'	: return 'Joomla Update (Multiple Extensions)';
+			case 'upload'		: return 'Upload Package File (File Upload)';
+			case 'folder'		: return 'Install from Directory';
+			case 'url'			: return 'Install from URL';
+			default: return 'Unknown';
 		}
 	}
 
@@ -572,6 +435,22 @@ class plgSystemEorisis_jQueryInstallerScript
 
 	//	--------------------------------------------------
 
+	protected function system_message()
+	{
+		if ($this->J3)
+		{
+			$type = 'notice';
+		}
+		else
+		{
+			$type = 'message';
+		}
+
+		JFactory::getApplication()->enqueueMessage($this->html, $type);
+	}
+
+	//	--------------------------------------------------
+
 	protected function version_correction($version)
 	{
 		if (strlen($version) == 3)
@@ -638,59 +517,13 @@ class plgSystemEorisis_jQueryInstallerScript
 
 	protected function app_title_full()
 	{
-		$current_path = str_replace('framework'.DIRECTORY_SEPARATOR.'install', '', dirname(__FILE__));
+		$current_path = str_replace('framework'.DIRECTORY_SEPARATOR.'install', '', $this->current_path);
 
 		if ($ini = $current_path.'language/'.(string)$this->xml->languages->language[1])
 		{
 			$ini = parse_ini_file($ini);
 			return $ini[strtoupper($this->element)];
 		}
-	}
-
-	//	--------------------------------------------------
-
-	protected function get_params()
-	{
-		if (!$this->ext_params)
-		{
-			$db = JFactory::getDbo();
-			$this->db = $db;
-			$query = $db->getQuery(true);
-			$query->select($this->quote_name('params'));
-			$query->from($this->quote_name('#__extensions'));
-			$query->where(array(
-				$this->quote_name('type').'='.$db->quote('plugin'),
-				$this->quote_name('folder').'='.$db->quote('system'),
-				$this->quote_name('element').'='.$db->quote($this->element)));
-			$db->setQuery($query);
-
-			$params = json_decode($db->loadResult());
-			if ($params and is_object($params))
-			{
-				return $params;
-			}
-
-			return null;
-		}
-
-		return $this->ext_params;
-	}
-
-	//	--------------------------------------------------
-
-	protected function set_params($params)
-	{
-		$db = JFactory::getDbo();
-		$this->db = $db;
-		$query = $db->getQuery(true);
-		$query->update($this->quote_name('#__extensions'));
-		$query->set($this->quote_name('params').'='.$db->quote($params));
-		$query->where(array(
-			$this->quote_name('type').'='.$db->quote('plugin'),
-			$this->quote_name('folder').'='.$db->quote('system'),
-			$this->quote_name('element').'='.$db->quote($this->element)));
-		$db->setQuery($query);
-		$db->query();
 	}
 
 	//	--------------------------------------------------
@@ -741,5 +574,51 @@ class plgSystemEorisis_jQueryInstallerScript
 				return true;
 			}
 		}
+	}
+
+	//	--------------------------------------------------
+
+	protected function get_params()
+	{
+		if (!$this->ext_params)
+		{
+			$db = JFactory::getDbo();
+			$this->db = $db;
+			$query = $db->getQuery(true);
+			$query->select($this->quote_name('params'));
+			$query->from($this->quote_name('#__extensions'));
+			$query->where(array(
+				$this->quote_name('type').'='.$db->quote($this->app_type),
+				$this->quote_name('folder').'='.$db->quote($this->app_group),
+				$this->quote_name('element').'='.$db->quote($this->element)));
+			$db->setQuery($query);
+
+			$params = json_decode($db->loadResult());
+			if ($params and is_object($params))
+			{
+				return $params;
+			}
+
+			return null;
+		}
+
+		return $this->ext_params;
+	}
+
+	//	--------------------------------------------------
+
+	protected function set_params($params)
+	{
+		$db = JFactory::getDbo();
+		$this->db = $db;
+		$query = $db->getQuery(true);
+		$query->update($this->quote_name('#__extensions'));
+		$query->set($this->quote_name('params').'='.$db->quote($params));
+		$query->where(array(
+			$this->quote_name('type').'='.$db->quote($this->app_type),
+			$this->quote_name('folder').'='.$db->quote($this->app_group),
+			$this->quote_name('element').'='.$db->quote($this->element)));
+		$db->setQuery($query);
+		$db->query();
 	}
 }

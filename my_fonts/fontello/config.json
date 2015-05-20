@@ -1,0 +1,16 @@
+{
+  "name": "",
+  "css_prefix_text": "icon-",
+  "css_use_suffix": false,
+  "hinting": true,
+  "units_per_em": 1000,
+  "ascent": 850,
+  "glyphs": [
+    {
+      "uid": "b7cf8dba5f349cb92b536d76db4a4178",
+      "css": "power-outline",
+      "code": 59392,
+      "src": "typicons"
+    }
+  ]
+}

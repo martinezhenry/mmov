@@ -24,6 +24,7 @@ if (!version_compare(JVERSION, 3, '>=')) { jimport('joomla.plugin.plugin'); }
 
 class plgSystemEorisis_jQuery extends JPlugin
 {
+	protected $J3;
 	protected $doc;
 	protected $web_root;
 	protected $web_root_relative;
@@ -52,6 +53,7 @@ class plgSystemEorisis_jQuery extends JPlugin
 
 		$this->doc = JFactory::getDocument();
 		$this->is_html = ($this->doc->getType() == 'html');
+		$this->J3 = version_compare(JVERSION, 3, '>=');
 
 		if (!$this->is_html) { return; }
 
@@ -62,17 +64,17 @@ class plgSystemEorisis_jQuery extends JPlugin
 		//	Load Library and Scripts in Order
 
 		//	jQuery Library, Migrate
-		$this->jquery_lib('1.11.2', '1.2.1');
+		$this->jquery_lib('1.11.2', '1.2.1'); // both are latest versions
 
 		//	All scripts depend on jQuery library
 		//	They will not load if the lib is not loaded in the same area
 		if ($this->url->jq_lib)
 		{
-			$this->ui('1.9.2');
-			$this->chosen('0.9.12');
+			$this->ui('1.9.2', '1.11.4'); // default, latest
+			$this->chosen('0.9.12', '1.4.1'); // default, latest
 			$this->easing();
 			$this->custom_media();
-			$this->twitter_bootstrap('2.3.2');
+			$this->twitter_bootstrap('2.3.2', '3.3.4'); // default, latest
 			$this->no_conflict();
 		}
 	}
@@ -94,64 +96,59 @@ class plgSystemEorisis_jQuery extends JPlugin
 
 	//	--------------------------------------------------
 
-	protected function jquery_lib($lib_version_default, $migrate_version_default)
+	protected function jquery_lib($lib_version_default, $migrate_version_default) // both are latest versions
 	{
 		if (!$this->area('jq_lib', 1)) { return; }
 
-		$lib_version_choice = (int)$this->params->get('jq_lib_version_choice', 1);
-		$default = 'jq_lib'; //  Specific: 'jq_lib_version'
-		switch ($lib_version_choice)
+		$type = '.min';
+
+		switch ($this->params->get('jq_lib_version_choice', 1))
 		{
-			case 1: $field = $default; break;
-			case 2: $field = 'jq_lib_custom'; break;
-			default: $field = $default;
+			case 1: // Auto
+			{
+				$lib_version = $this->auto_version('jq_lib', $lib_version_default, $lib_version_default); // $version_default, $version_latest
+				$url_local = $this->media_url.'lib/jquery-'.$lib_version.'.min.js';
+			} break;
+
+			case 2: // Specific
+			{
+				$lib_version = $this->clean_version('jq_lib', $lib_version_default);
+				$url_local = $this->media_url.'lib/jquery-'.$lib_version.'.min.js';
+			} break;
+
+			case 3: // Custom
+			{
+				$lib_version = $this->clean_version('jq_lib_custom', $lib_version_default);
+
+				if (!$this->params->get('jq_lib_custom_version_type', 1))
+				{
+					$type = '';
+				}
+
+				$url_local = $this->custom_local_path('jq_lib', 'jquery-'.$lib_version.$type.'.js');
+			} break;
 		}
 
 		$url = null;
-		$url_local = $this->media_url.'lib/jquery-'.$this->clean_version('jq_lib', $lib_version_default).'.min.js';
 
-		//	Use Specific or Custom Version
-		if ($lib_version_choice)
+		//	Source: CDN
+		if ($lib_version and ($this->params->get('jq_lib_source', 1) == 1))
 		{
-			$lib_version = $this->clean_version($field, $lib_version_default);
-
-			//	Source: CDN (Specific or Custom Version)
-			if ($lib_version and ($this->params->get('jq_lib_source_specific', 1) == 1))
-			{
-				$js_type = '.min';
-				if (($lib_version_choice == 2) and !$this->params->get('jq_lib_custom_version_type', 1))
-				{
-					$js_type = '';
-				}
-
-				$default = $this->cdn->jquery.'jquery-'.$lib_version.$js_type.'.js';
-				switch ($this->params->get('jq_lib_source_specific_cdn', 1))
-				{
-					case 1: $url = $default; break;
-					case 2: $url = $this->cdn->google.'jquery/'.$this->version_correction($lib_version).'/jquery'.$js_type.'.js'; break;
-					case 3: $url = $this->cdn->cloudflare.'jquery/'.$this->version_correction($lib_version).'/jquery'.$js_type.'.js'; break;
-					case 4: $url = $this->cdn->microsoft.'jQuery/jquery-'.$lib_version.$js_type.'.js'; break;
-					default: $url = $default;
-				}
-
-				$url = $this->cdn_fallback('jq_lib', $url, $url_local);
-			}
-			else // Source: Local
-			{
-				$url = $url_local;
-			}
-		}
-		else // Use Always Latest
-		{
-			$default = $this->cdn->jquery.'jquery-latest.min.js';
-			switch ($this->params->get('jq_lib_source_latest', 1))
+			$default = $this->cdn->jquery.'jquery-'.$lib_version.$type.'.js';
+			switch ($this->params->get('jq_lib_source_cdn', 1))
 			{
 				case 1: $url = $default; break;
-				case 2: $url = $this->cdn->google.'jquery/1/jquery.min.js'; break;
+				case 2: $url = $this->cdn->google.'jquery/'.$this->version_correction($lib_version).'/jquery'.$type.'.js'; break;
+				case 3: $url = $this->cdn->cloudflare.'jquery/'.$this->version_correction($lib_version).'/jquery'.$type.'.js'; break;
+				case 4: $url = $this->cdn->microsoft.'jQuery/jquery-'.$lib_version.$type.'.js'; break;
 				default: $url = $default;
 			}
 
 			$url = $this->cdn_fallback('jq_lib', $url, $url_local);
+		}
+		else // Source: Local
+		{
+			$url = $url_local;
 		}
 
 		if (!$url) { return; }
@@ -164,10 +161,8 @@ class plgSystemEorisis_jQuery extends JPlugin
 		//	Migrate
 
 		$migrate = $this->params->get('migrate', 1);
-
-		if ((!$lib_version_choice or
-			($migrate == 2) or
-			($migrate == 1) and version_compare($lib_version, '1.9.0', '>=')))
+		if (($migrate == 2) or // Always Load
+			(($migrate == 1) and version_compare($lib_version, '1.9.0', '>='))) // Auto Load
 		{
 			$migrate_version = $this->clean_version('migrate', $migrate_version_default);
 			$url_local = $this->media_url.'plugins/migrate/jquery-migrate-'.$migrate_version.'.min.js';
@@ -198,7 +193,7 @@ class plgSystemEorisis_jQuery extends JPlugin
 
 	//	--------------------------------------------------
 
-	protected function ui($version_default)
+	protected function ui($version_default, $version_latest)
 	{
 		if (!$this->area('ui', 0)) { return; }
 
@@ -211,7 +206,15 @@ class plgSystemEorisis_jQuery extends JPlugin
 		//	Use Preset UI Files
 		if (!$this->params->get('ui_custom', 0))
 		{
-			$version = $this->clean_version('ui', $version_default);
+			if ($this->params->get('ui_version_choice', 1) == 1) // Auto
+			{
+				$version = $this->auto_version('ui', $version_default, $version_latest);
+			}
+			else // Specific
+			{
+				$version = $this->clean_version('ui', $version_default);
+			}
+
 			$file_min = 'jquery-ui.min';
 
 			if ($elem != 'css')
@@ -226,22 +229,43 @@ class plgSystemEorisis_jQuery extends JPlugin
 				$theme_default = 'ui-lightness';
 				$theme = preg_replace('/[^a-z-]+/', '', $this->params->get('ui_theme', $theme_default));
 
-				//	UI versions below 1.10.1 have a 'base' theme. It's minified css file is inside a /minified/ dir
-				//	UI versions below 1.10.0 have no minified CSS theme files except the 'base' theme
-
-				$file_css = $file_min.'.css';
-
-				if ($theme == 'base')
+				//	UI versions below 1.10.1 ..
+				if (version_compare($version, '1.10.1', '<='))
 				{
-					//	UI version 1.11.3 brought back the 'base' theme
-					//	Versions below 1.11.3 will use the default
-					if (version_compare($version, '1.11.2', '<='))
+					if ($theme == 'base') // ..have a 'base' theme
 					{
-						$theme = $theme_default;
+						$file_css = 'minified/'.$file_min; // It's minified css file is inside a /minified/ dir
+					}
+					else
+					{
+						//	UI versions below 1.10.0 have no minified CSS theme files (except the 'base' theme which is checked above)
+						if (version_compare($version, '1.10.0', '<='))
+						{
+							$file_css = 'jquery-ui';
+						}
+						else
+						{
+							$file_css = $file_min;
+						}
+					}
+				}
+				else
+				{
+					$file_css = $file_min;
+
+					if ($theme == 'base')
+					{
+						//	UI version 1.11.3 brought back the 'base' theme
+						//	UI version 1.11.4 removed the 'base' theme again
+						//	So versions 1.11.4, or 1.11.2 and older will use the default
+						if (($version == '1.11.4') or version_compare($version, '1.11.2', '<='))
+						{
+							$theme = $theme_default;
+						}
 					}
 				}
 
-				$url_css_part = $version.'/themes/'.$theme.'/'.$file_css;
+				$url_css_part = $version.'/themes/'.$theme.'/'.$file_css.'.css';
 				$url_css_local = $this->media_url.'ui/'.$url_css_part;
 			}
 
@@ -302,11 +326,19 @@ class plgSystemEorisis_jQuery extends JPlugin
 
 	//	--------------------------------------------------
 
-	protected function twitter_bootstrap($version_default)
+	protected function twitter_bootstrap($version_default, $version_latest)
 	{
 		if (!$this->area('tb', 0)) { return; }
 
-		$version = $this->clean_version('tb', $version_default);
+		if ($this->params->get('tb_version_choice', 1) == 1) // Auto
+		{
+			$version = $this->auto_version('tb', $version_default, $version_latest);
+		}
+		else // Specific
+		{
+			$version = $this->clean_version('tb', $version_default);
+		}
+
 		$elem = $this->params->get('tb_elem', 'js');
 		$dir = 'bootstrap/';
 		$file_js = null;
@@ -322,7 +354,7 @@ class plgSystemEorisis_jQuery extends JPlugin
 
 		if ($elem != 'js')
 		{
-			if ($version == $version_default) // 2.3.2
+			if ($version == '2.3.2')
 			{
 				$file_css = 'bootstrap-combined.min.css';
 			}
@@ -414,11 +446,19 @@ class plgSystemEorisis_jQuery extends JPlugin
 
 	//	--------------------------------------------------
 
-	protected function chosen($version_default)
+	protected function chosen($version_default, $version_latest)
 	{
 		if (!$this->area('chosen', 0)) { return; }
 
-		$version = $this->clean_version('chosen', $version_default);
+		if ($this->params->get('chosen_version_choice', 1) == 1) // Auto
+		{
+			$version = $this->auto_version('chosen', $version_default, $version_latest);
+		}
+		else // Specific
+		{
+			$version = $this->clean_version('chosen', $version_default);
+		}
+
 		$url_part = 'chosen/'.$version.'/chosen.jquery.min.js';
 		$url_local = $this->media_url.'plugins/'.$url_part;
 
@@ -580,9 +620,9 @@ class plgSystemEorisis_jQuery extends JPlugin
 
 	//	--------------------------------------------------
 
-	protected function clean_version($field, $version_default)
+	protected function clean_version($field, $default)
 	{
-		$version = $this->params->get($field.'_version', $version_default);
+		$version = $this->params->get($field.'_version', $default);
 		$version = preg_replace('/[^0-9a-zA-Z.-]+/', '', $version);
 		$version = str_replace('..', '', $version);
 
@@ -623,7 +663,7 @@ class plgSystemEorisis_jQuery extends JPlugin
 				if ($this->params->get('curl_useragent', 0))
 				{
 					curl_setopt($cURL, CURLOPT_USERAGENT,
-						$this->clean($this->params->get('curl_useragent_txt', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:35.0) Gecko/20100101 Firefox/35.0'))
+						$this->clean($this->params->get('curl_useragent_txt', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:36.0) Gecko/20100101 Firefox/36.0'))
 					);
 				}
 
@@ -644,6 +684,29 @@ class plgSystemEorisis_jQuery extends JPlugin
 		}
 
 		return $url;
+	}
+
+	//	--------------------------------------------------
+
+	protected function custom_local_path($field, $filename)
+	{
+		if ($path = $this->params->get($field.'_custom_local_path'))
+		{
+			if (strpos($path, '.') === false)
+			{
+				$path = str_replace('\\', '/', $path);
+				$path = trim($path, '/');
+
+				$url = $path.'/'.$filename;
+				if ($url = $this->clean_url($url))
+				{
+					if (!$this->external_url)
+					{
+						return $this->main_url.$url;
+					}
+				}
+			}
+		}
 	}
 
 	//	--------------------------------------------------
@@ -847,6 +910,7 @@ class plgSystemEorisis_jQuery extends JPlugin
 		}
 		else
 		{
+			$this->external_url = false;
 			$url = preg_replace('/[^a-zA-Z0-9\/._-]+/', '', $url);
 		}
 
@@ -1222,5 +1286,109 @@ class plgSystemEorisis_jQuery extends JPlugin
 				$this->load('css', $css, $this->css_media_type());
 			}
 		}
+	}
+
+	//	--------------------------------------------------
+
+	protected function auto_version($element, $version_default, $version_latest)
+	{
+		if ($this->J3)
+		{
+			switch ($element)
+			{
+				//	--------------------------------------------------
+				//	jQuery library (Since Joomla 3.0.0)
+
+				case 'jq_lib':
+				{
+					//	jQuery 1.11.2 (Joomla 3.4.0 Beta 1 to 3.4.1)
+					//	jQuery 1.11.1 (Joomla 3.3.1 to 3.4.0 Alpha)
+					//	jQuery 1.11.0 (Joomla 3.2.3 to 3.3.0)
+					//	jQuery 1.10.2 (Joomla 3.2.0 to 3.2.2)
+					//	jQuery 1.8.3 (Joomla 3.1.0 to 3.1.6)
+					//	jQuery 1.8.1 (Joomla 3.0.0 to 3.0.4)
+
+					if (version_compare(JVERSION, '3.4.0-beta1', '>='))
+					{
+						return $version_default; // jQuery 1.11.2 (Joomla 3.4.0-beta1 to 3.4.1)
+					}
+					elseif (version_compare(JVERSION, '3.3.1', '>=') and
+							version_compare(JVERSION, '3.4.0-alpha', '<='))
+					{
+						return '1.11.1'; // Joomla 3.3.1 to 3.4.0-alpha
+					}
+					elseif (version_compare(JVERSION, '3.2.3', '>=') and
+							version_compare(JVERSION, '3.3.0', '<='))
+					{
+						return '1.11.0'; // Joomla 3.2.3 to 3.3.0
+					}
+					elseif (version_compare(JVERSION, '3.2.0', '>=') and
+							version_compare(JVERSION, '3.2.2', '<='))
+					{
+						return '1.10.2'; // Joomla 3.2.0 to 3.2.2
+					}
+					elseif (version_compare(JVERSION, '3.1.0', '>=') and
+							version_compare(JVERSION, '3.1.6', '<='))
+					{
+						return '1.8.3'; // Joomla 3.1.0 to 3.1.6
+					}
+					elseif (version_compare(JVERSION, '3.1.0', '<'))
+					{
+						return '1.8.1'; // Joomla 3.0.0 to 3.0.4
+					}
+				} break;
+
+				//	--------------------------------------------------
+				//	jQuery Migrate (Since Joomla 3.2.0)
+
+				//	jQuery Migrate will load automatically by itself, no need to be here
+				//	jQuery Migrate 1.2.1 (Joomla 3.2.0 to 3.4.1)
+				//	Joomla 3.0.0 to 3.1.6 does not have Migrate included in the core, because it uses jQuery library up to version 1.8.3.
+
+				//	--------------------------------------------------
+				//	jQuery UI (Since Joomla 3.0.0)
+
+				case 'ui':
+				{
+					//	jQuery UI 1.9.2 (Joomla 3.2.0 to 3.4.1)
+					//	jQuery UI 1.8.23 (Joomla 3.0.0 to 3.1.6)
+
+					if (version_compare(JVERSION, '3.2.0', '>='))
+					{
+						return $version_default; // UI 1.9.2 (Joomla 3.2.0 to 3.4.1)
+					}
+					elseif (version_compare(JVERSION, '3.2.0', '<'))
+					{
+						return '1.8.23'; // Joomla 3.0.0 to 3.1.6
+					}
+				} break;
+
+				//	--------------------------------------------------
+				//	Twitter Bootstrap (Since Joomla 3.0.0)
+
+				case 'tb':
+				{
+					//	Bootstrap 2.3.2 [Custom Modified] (Joomla 3.1.4 to 3.4.1)
+					//	Bootstrap 2.1.0 [Custom Modified] (Joomla 3.0.0 to 3.1.1)
+
+					//	Bootstrap 2.3.2 appears to work fine in all cases
+					return $version_default; // Twitter Bootstrap 2.3.2
+				} break;
+
+				//	--------------------------------------------------
+				//	Chosen (Since Joomla 3.0.0)
+
+				case 'chosen':
+				{
+					//	Chosen 0.14.0 [Custom Modified] (Joomla 3.2.3 to 3.4.1)
+					//	Chosen 0.9.8 [Custom Modified] (Joomla 3.0.0 to 3.2.2)
+
+					//	Chosen 0.9.12 appears to work fine in all cases
+					return $version_default; // Chosen 0.9.12 (Joomla 3.2.2 to 3.4.1)
+				} break;
+			}
+		}
+
+		return $version_latest;
 	}
 }

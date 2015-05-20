@@ -1,17 +1,29 @@
 <?php
 
+/************************************************************************
+*									*
+*  Archivo : conexionPostgresql.php					*
+*  Desarrollador: Henry Martinez.					*
+*  Fecha: Marzo 2015.							*
+*  Contenido: Clase para establecer las comunicaciones entre la DB
+		 postgresql y los datos					*
+*									*
+************************************************************************/
+
+
+
 	class Conexion {
 
 
 		private $user = 'mmov';
 		private $pass = 'mmov01';
-		private $host = '190.77.104.180';
-		private $db   = 'mmov';
+		private $host = 'minutomovil.ddns.net';
+		private $db   = 'prod_mmov';
 		private $port = '5432';
 		public $conex;
 		public $error;
 
-
+		/* FUNCTION PARA ESTABLECER LA CONEXION CON LA DB */
 
 		private function conectar(){
 
@@ -25,7 +37,7 @@
 
 		}
 
-
+		/* FUNCTION PARA DESCONECTARSE DE LA DB POSTGRESQL */
 		function desconectar(){
 			pg_close($this->conex);
 			unset($this->conex);
@@ -42,7 +54,7 @@
 		}
 
 
-
+		/* FUNCTION QUE EJECUTA LAS CONSULTAS DE LA DB */
 		function consulta($sql){
 			$this->conectar();
 
@@ -69,7 +81,7 @@
 			return $filas;
 		}
 
-
+		/* FUNCTION PARA EJECUTAR LOS QUERY PARA INGRESAR LOS NUEVOS DATOS */
 		function insertar($sql){
 			$this->conectar();
 

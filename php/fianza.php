@@ -1,5 +1,16 @@
 <?php 
 
+/************************************************************************
+*									*
+*  Archivo : fianza.php						*
+*  Desarrollador: Henry Martinez.					*
+*  Fecha: Marzo 2015.							*
+*  Contenido: Metodos para almacenar y consultar datos para el proceso	*
+*	      de fianza MMOV					*
+*									*
+************************************************************************/
+
+/* FUNCTION PARA ALMACENAR LOS DATOS ENVIADOS DEL FORMULARIO */
 
 function guardarDatos($datos){
 
@@ -17,7 +28,7 @@ function guardarDatos($datos){
 	$fianza = $filas[0]['idfianza'];
 
 	$sql = "insert into comision_fianza (fianza_idfianza, fecha, comision) values
-		('" . $fianza . "', '". $datos['dat_fecha_comision'] . "', '". $datos['tex_monto'] ."')";
+		('" . $fianza . "', '01/". $datos['dat_fecha_comision'] . "', '". $datos['tex_monto'] ."')";
 
 		$filas = $psql->insertar($sql);
 
@@ -31,7 +42,8 @@ function guardarDatos($datos){
 
 }
 
-//print_r( $_POST );
+
+/* AREA PARA SELECCIONAR LA FUNCION A EJECUTAR SEGUN LA SOLICITUD DEL USUARIO */
 
 if(isset($_POST['sel_dti'])){
 

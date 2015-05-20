@@ -1,0 +1,12 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg">
+<metadata>Copyright (C) 2015 by original authors @ fontello.com</metadata>
+<defs>
+<font id="fontello" horiz-adv-x="1000" >
+<font-face font-family="fontello" font-weight="400" font-stretch="normal" units-per-em="1000" ascent="850" descent="-150" />
+<missing-glyph horiz-adv-x="1000" />
+<glyph glyph-name="power-outline" unicode="&#xe800;" d="m756 622q129-129 129-313 0-185-129-314t-313-129q-184 0-313 129-130 130-130 314 0 183 130 313 66 66 156 38l0 18q0 65 46 110t111 46 110-46 46-110l0-18q40 13 83 3t74-41z m-366 56l0-261q0-22 16-37t37-15 36 15 16 37l0 261q0 21-16 36t-36 15-37-15-16-36z m-51-199q-9-24-25-41-54-54-54-129t54-129q51-51 129-51t128 51q54 54 54 129t-54 129q-15 15-23 41l0-62q0-43-31-74t-74-30q-43 0-74 30t-30 74l0 62z m104-405q-95 0-165 69t-69 166q0 98 69 166 15 15 15 37t-15 36-37 15-37-15q-100-100-100-239 0-140 100-240 99-99 239-99 141 0 240 99t98 240q0 140-98 239-15 15-37 15t-37-15-15-36 15-37q69-68 69-166 0-96-70-166t-165-69z" horiz-adv-x="885" />
+</font>
+</defs>
+</svg>
