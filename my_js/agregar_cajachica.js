@@ -5,6 +5,7 @@ function cargarItems(id){
 jQuery.ajax({
 
 	type : 'post',
+	cache: false,
 	data : {cargarItems:1},
 	url  : '../../php/cargarDatos.php',
 	
@@ -88,7 +89,7 @@ minDate: minFecha , //Pone la fecha mínima como el día siguiente
 });
 */
 
-jQuery('#fil_'+ fila  +' input[name="dat_fecha[]"]').datepicker();
+jQuery('#fil_'+ fila  +' input[name="dat_fecha[]"]').datepicker({dateFormat : "dd/mm/yy", constrainInput: true});
 
 
 jQuery('#fil_'+ fila  +' input[name="tex_num_factura[]"]').focus();
@@ -103,6 +104,7 @@ function ultimaCajaChica(respuesta){
 jQuery.ajax({
 
 	type : 'post',
+	cache: false,
 	url : '../../php/reposicion_caja_chica.php',
 	data : { ultimaCajaChica : 1 }
 
@@ -197,6 +199,7 @@ return;
 jQuery.ajax({
 
 	type : 'post',
+	cache: false,
 	url : '../../php/reposicion_caja_chica.php',
 	data : { validarNota : 1, nota : tipo+nota }
 
@@ -393,13 +396,16 @@ jQuery('select[name="sel_item[]"]').each(function (idx){
 
 
 if(!salida){ return false; }
-
+var salida2 = true;
 
 jQuery('form[name="form_cajaChica"] .alerta').each(function(idx){
 
 	alert('Existen campos invalidos. Verifique');
-	return false
+	salida2 = false;
+	return;
 });
+
+if (!salida2){ return false; }
 
 
 if (fecha == NULL){
@@ -421,6 +427,7 @@ function cargarEdiciones(id){
 
 
 	type : 'post',
+	cache: false,
 	url : '../../php/reposicion_caja_chica.php',
 	data : { cargarEdiciones : 1, id : id },
 	success : function(resp){
